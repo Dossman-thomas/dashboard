@@ -1,26 +1,14 @@
 {
-  "name": "dashboard-node-project",
+  "name": "dashboard-project",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "client": "cd client && ng serve",
     "server": "cd server && node index.js",
-    "start": "concurrently \"npm run client\" \"npm run server\"", 
-    "start:dev": "NODE_ENV=dev nodemon src/index.js",
-    "start:qa": "NODE_ENV=qa nodemon src/index.js",
-    "start:uat": "NODE_ENV=uat nodemon src/index.js",
-    "start:prod": "NODE_ENV=prod nodemon src/index.js"
+    "start": "concurrently \"npm run client\" \"npm run server\""
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "express-validator": "^7.2.0",
-    "morgan": "^1.10.0",
-    "pg": "^8.13.0",
-    "sequelize": "^6.37.3"
-  },
+
   "devDependencies": {
     "concurrently": "^9.0.1",
     "nodemon": "^3.1.7"
