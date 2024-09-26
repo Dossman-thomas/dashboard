@@ -1,21 +1,43 @@
-// server/index.js
-const express = require('express');
-const cors = require('cors');
+import { env, sequelize } from './config/index.js';
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+
+import { routes } from './routes/router.js';
+import { response } from './utils/index.js';
+import { messages } from './messages/index.js';
+
+const port = env.server.port || process.env.PORT || 3000;
 const app = express();
 
-// Port
-const PORT = process.env.PORT || 3000;
+app.use(
+  cors({
+    origin: '*',
+  })
+);
 
-// middleware
-app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Example route
-app.get('/', (req, res) => {
-  res.send('Hello from the backend!');
+app.use('/api', routes);
+
+app.use('/', (req, res) => {
+  return res.status(200).send('OK');
 });
 
-// start server
-app.listen(PORT, () => {
+app.use((err, req, res, next) => {
+  console.error(err);
+  return response(res, {
+    statusCode: 500,
+    message: messages.general.INTERNAL_SERVER_ERROR,
+  });
+});
+
+app.listen(port, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+(async () => {
+  await sequelize.sync({ alter: true });
+})();
