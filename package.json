@@ -6,7 +6,8 @@
   "scripts": {
     "client": "cd client && ng serve",
     "server": "cd server && node index.js",
-    "start": "concurrently \"npm run client\" \"npm run server\""
+    "start": "concurrently \"npm run client\" \"npm run server\"",
+    "install": "concurrently \"npm install\" \"cd client && npm install\" \"cd server && npm install\""
   },
 
   "devDependencies": {
