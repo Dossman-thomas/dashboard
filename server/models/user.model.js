@@ -1,8 +1,11 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/index.js';
+import bcrypt from 'bcrypt';
+
+// User model
 
 export const UserModel =  sequelize.define('users', {
-    userId: {
+    id: {
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
@@ -21,7 +24,12 @@ export const UserModel =  sequelize.define('users', {
         allowNull: false,
     },
     role: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('admin', 'data manager', 'employee'), // Enum is a string object with a value chosen from a list of permitted values that are enumerated explicitly in the column definition.
         allowNull: false, 
     },
+});
+
+// Hashing the password before saving it to the database
+UserModel.beforeCreate(async (user) => { 
+    user.password = await bcrypt.hash(user.password, 10); // 10 is the salt round - the higher the number, the more secure the password.
 });
