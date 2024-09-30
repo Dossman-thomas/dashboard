@@ -1,8 +1,8 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../../config/index.js";
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../../config/index.js';
 
 // Permission model
-export const RolePermissionModel = sequelize.define("permissions", {
+export const RolePermissionModel = sequelize.define('permissions', {
     role: {
         type: DataTypes.STRING,
         allowNull: false,
