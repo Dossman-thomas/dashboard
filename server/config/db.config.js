@@ -7,7 +7,7 @@ import { env } from './env.config.js';
 //   // e.g., UTC offset. Use any offset that you would like.
 // });
 
-const dbConfig = {
+const dbConfig = { // Database configuration object
   database: env.db.database,
   username: env.db.username,
   password: env.db.password,
@@ -50,7 +50,7 @@ sequelize
     console.log('Connection has been established successfully.');
   })
   .catch((err) => {
-    console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to the database:', err); // throw error incase something goes wrong while trying to establish a connection to the db.
   });
 
 export { sequelize };

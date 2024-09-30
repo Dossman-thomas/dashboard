@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const nodeEnv = process.env.NODE_ENV || 'dev';
-dotenv.config({ path: `.env.${nodeEnv}` });
+const nodeEnv = process.env.NODE_ENV || 'dev'; // Set the node environment to development if it is not set
+dotenv.config({ path: `.env.${nodeEnv}` }); // Load the environment variables from the .env file
 
-export const env = {
+export const env = { // Environment configuration object
   nodeEnv: nodeEnv,
   db: {
     database: process.env.DB_DATABASE,
