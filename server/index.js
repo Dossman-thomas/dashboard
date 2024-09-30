@@ -7,7 +7,7 @@ import { routes } from './routes/router.js';
 import { response } from './utils/index.js';
 import { messages } from './messages/index.js';
 
-const port = env.server.port || process.env.PORT || 3000;
+const PORT = env.server.port || process.env.PORT || 3000;
 const app = express();
 
 app.use(
@@ -34,7 +34,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
