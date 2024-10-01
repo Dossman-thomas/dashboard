@@ -39,5 +39,5 @@ app.listen(PORT, () => {
 });
 
 (async () => {
-  await sequelize.sync({ alter: true });
+  await sequelize.sync({ alter: false });
 })();

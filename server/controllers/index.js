@@ -5,4 +5,4 @@ export {
   updateUser,
   deleteUser,
   verifyUserPassword,
-} from './user.controller';
+} from './user.controller.js';

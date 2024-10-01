@@ -53,7 +53,7 @@ sequelize
 
     // Sync the models with the database
     sequelize
-      .sync({ force: false }) // `force: false` ensures existing tables are not dropped
+      .sync({ force: true }) // `force: false` ensures existing tables are not dropped
       .then(() => {
         console.log(
           "Database & tables have been created or updated successfully."
