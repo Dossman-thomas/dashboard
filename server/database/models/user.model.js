@@ -30,6 +30,7 @@ export const UserModel = sequelize.define('users', {
         allowNull: false,
     },
 }, {
+    freezeTableName: true, // Prevent sequelize from pluralizing the table name
     timestamps: true, // Enable createdAt and updatedAt
 });
 

@@ -219,4 +219,4 @@ const seedUsers = async () => {
 };
 
 // Run the seed function
-seedUsers(); 
+module.exports = seedUsers; 

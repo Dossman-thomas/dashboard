@@ -34,10 +34,15 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-
+// Sync database and start the server after successful connection
 (async () => {
-  await sequelize.sync({ alter: false });
+  try {
+    await sequelize.sync({ alter: true });
+    console.log('Database synced successfully');
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Unable to sync database:', error);
+  }
 })();

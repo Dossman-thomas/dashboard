@@ -44,27 +44,26 @@ const sequelize = new Sequelize(
   }
 );
 
-// Test the connection
-// Test the connection
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Connection to Database has been established successfully.");
+// // Test the connection
+// sequelize
+//   .authenticate()
+//   .then(() => {
+//     console.log("Connection to Database has been established successfully.");
 
-    // Sync the models with the database
-    sequelize
-      .sync({ force: true }) // `force: false` ensures existing tables are not dropped
-      .then(() => {
-        console.log(
-          "Database & tables have been created or updated successfully."
-        );
-      })
-      .catch((syncErr) => {
-        console.error("Error during table creation/update:", syncErr);
-      });
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err); // throw error in case something goes wrong while trying to establish a connection to the db.
-  });
+//     // Sync the models with the database
+//     sequelize
+//       .sync({ force: true }) // `force: false` ensures existing tables are not dropped
+//       .then(() => {
+//         console.log(
+//           "Database & tables have been created or updated successfully."
+//         );
+//       })
+//       .catch((syncErr) => {
+//         console.error("Error during table creation/update:", syncErr);
+//       });
+//   })
+//   .catch((err) => {
+//     console.error("Unable to connect to the database:", err); // throw error in case something goes wrong while trying to establish a connection to the db.
+//   });
 
 export { sequelize };
