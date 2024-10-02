@@ -25,5 +25,5 @@ userRouter.put('/update/:id', updateUser); // endpoint: /api/users/update/:id
 // Delete a user by ID route
 userRouter.delete('/delete/:id', deleteUser); // endpoint: /api/users/delete/:id
 
-// Verify user password route
-userRouter.post('/:id/verify-password', verifyUserPassword); // endpoint: /api/users/:id/verify-password
+// // Verify user password route
+// userRouter.post('/:id/verify-password', verifyUserPassword); // endpoint: /api/users/:id/verify-password
