@@ -1,4 +1,5 @@
 import { UserModel } from "../models/index.js";
+import bcrypt from "bcrypt";
 
 const users = [
   {
@@ -115,108 +116,22 @@ const users = [
     password: "Employee@789!",
     role: "employee",
   },
-  {
-    name: "James King",
-    email: "jamesk@example.com",
-    password: "Employee@890!",
-    role: "employee",
-  },
-  {
-    name: "Charlotte Scott",
-    email: "charlotte@example.com",
-    password: "Employee@901!",
-    role: "employee",
-  },
-  {
-    name: "Benjamin Wright",
-    email: "benjamin@example.com",
-    password: "Employee@012!",
-    role: "employee",
-  },
-  {
-    name: "Amelia Green",
-    email: "amelia@example.com",
-    password: "Employee@1234!",
-    role: "employee",
-  },
-  {
-    name: "Elijah Adams",
-    email: "elijah@example.com",
-    password: "Employee@2345!",
-    role: "employee",
-  },
-  {
-    name: "Harper Baker",
-    email: "harper@example.com",
-    password: "Employee@3456!",
-    role: "employee",
-  },
-  {
-    name: "Logan Carter",
-    email: "logan@example.com",
-    password: "Employee@4567!",
-    role: "employee",
-  },
-  {
-    name: "Evelyn Mitchell",
-    email: "evelyn@example.com",
-    password: "Employee@5678!",
-    role: "employee",
-  },
-  {
-    name: "Jackson Perez",
-    email: "jackson@example.com",
-    password: "Employee@6789!",
-    role: "employee",
-  },
-  {
-    name: "Harper Nelson",
-    email: "harper@example.com",
-    password: "Employee@7890!",
-    role: "employee",
-  },
-  {
-    name: "Mason Cooper",
-    email: "mason@example.com",
-    password: "Employee@8901!",
-    role: "employee",
-  },
-  {
-    name: "Avery Richardson",
-    email: "avery@example.com",
-    password: "Employee@9012!",
-    role: "employee",
-  },
-  {
-    name: "Alexander Collins",
-    email: "alexander@example.com",
-    password: "Employee@0123!",
-    role: "employee",
-  },
-  {
-    name: "Ella Murphy",
-    email: "ella@example.com",
-    password: "Employee@12345!",
-    role: "employee",
-  },
-  {
-    name: "Henry Ward",
-    email: "henry@example.com",
-    password: "Employee@23456!",
-    role: "employee",
-  },
 ];
 
+// Function to hash the passwords
+const hashPassword = async (password) => {
+  const saltRounds = 10; // You can adjust the salt rounds as needed
+  return await bcrypt.hash(password, saltRounds);
+};
 
 // Seed users to the database using the UserModel function
 const seedUsers = async () => {
-    try {
-        await UserModel.bulkCreate(users);
-        console.log("Users seeded successfully!");
-    } catch (error) {
-        console.error("Error seeding users: ", error);
-    }
+  // Hash passwords for all users before saving
+  for (const user of users) {
+    user.password = await hashPassword(user.password);
+  }
+  await UserModel.bulkCreate(users);
 };
 
-// Run the seed function
-module.exports = seedUsers; 
+// Export the seedUsers function
+export { seedUsers };

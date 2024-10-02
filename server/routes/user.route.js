@@ -14,7 +14,7 @@ export const userRouter = Router();
 userRouter.post('/create-new', createUser); // endpoint: /api/users/create-new
 
 // Get a user by ID route
-userRouter.get('/get/:id', getUserById); // endpoint: /api/users/get/:id
+userRouter.get('/:id', getUserById); // endpoint: /api/users/:id
 
 // Get all users route
 userRouter.get('/', getAllUsers); // endpoint: /api/users
