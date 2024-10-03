@@ -1,4 +1,4 @@
-import { permissionsModel } from "../models/index.js";
+import { RolePermissionModel } from "../models/index.js";
 
 const permissions = [
   {
@@ -24,10 +24,9 @@ const permissions = [
   },
 ];
 
-
 const seedPermissions = async () => {
   try {
-    await permissionsModel.bulkCreate(permissions);
+    await RolePermissionModel.bulkCreate(permissions);
     console.log("Permissions seeded successfully");
   } catch (error) {
     console.error("Error seeding permissions: ", error);
