@@ -1,4 +1,5 @@
 import { seedUsers } from "./user.seed.js";
+import { seedPermissions } from "./permission.seed.js";
 import { sequelize } from "../../config/index.js";
 
 const seedDatabase = async () => {
@@ -6,6 +7,7 @@ const seedDatabase = async () => {
     await sequelize.sync({ force: true });
 
     await seedUsers();
+    await seedPermissions();
 
     console.log("Database seeded successfully");
 
