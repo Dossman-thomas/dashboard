@@ -6,3 +6,9 @@ export {
   deleteUser,
   verifyUserPassword,
 } from './user.controller.js';
+export {
+  getPermissions,
+  getAllPermissions,
+  getPermissionsForRole,
+  updatePermissionsForRole,
+} from "../controllers/permission.controller";

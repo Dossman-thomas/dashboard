@@ -8,7 +8,7 @@ import {
 } from "../services/index.js";
 
 // Get permissions for a specific user
-export const getPermissionsForUser = async (req, res) => {
+export const getPermissions = async (req, res) => {
     try {
         const userPermissions = await getPermissionsForUser(req.params.id);
         if (!userPermissions) {
@@ -32,7 +32,7 @@ export const getPermissionsForUser = async (req, res) => {
 };
 
 // Retrieve all permissions
-export const getAllPermissionsController = async (req, res) => {
+export const getAllPermissions = async (req, res) => {
     try {
       const permissions = await getAllPermissions();
       if (!permissions.length) {
@@ -56,7 +56,7 @@ export const getAllPermissionsController = async (req, res) => {
   };
   
   // Get permissions for a specific role
-  export const getPermissionsForRoleController = async (req, res) => {
+  export const getPermissionsForRole = async (req, res) => {
     try {
       const rolePermissions = await getPermissionsForRole(req.params.role);
       if (!rolePermissions) {
@@ -80,7 +80,7 @@ export const getAllPermissionsController = async (req, res) => {
   };
   
   // Update permissions for a specific role
-  export const updatePermissionsForRoleController = async (req, res) => {
+  export const updatePermissionsForRole = async (req, res) => {
     try {
       const updatedPermissions = await updatePermissionsForRole(req.params.role, req.body);
       return response(res, {
