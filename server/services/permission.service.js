@@ -1,4 +1,4 @@
-import { RolePermissionModel } from '../models/index.js';
+import { RolePermissionModel } from '../database/models/index.js';
 
   // Check current role permissions for a specific user
   export const getPermissionsForUser = async (userId) => {
@@ -11,7 +11,7 @@ import { RolePermissionModel } from '../models/index.js';
   };
 
 // Retrieve all permissions
-export const getAllPermissions = async () => {
+export const getAllPermissionsService = async () => {
   try {
     const permissions = await RolePermissionModel.findAll();
     return permissions;
@@ -21,7 +21,7 @@ export const getAllPermissions = async () => {
 };
 
 // Get permissions for a specific role
-export const getPermissionsForRole = async (role) => {
+export const getPermissionsForRoleService = async (role) => {
     try {
         const rolePermissions = await RolePermissionModel.findOne({ where: { role } });
         return rolePermissions;
@@ -31,7 +31,7 @@ export const getPermissionsForRole = async (role) => {
 }; 
 
 // Update permissions for a specific role
-export const updatePermissionsForRole = async (role, updatedPermissions) => {
+export const updatePermissionsForRoleService = async (role, updatedPermissions) => {
     try {
         const rolePermissions = await RolePermissionModel.findOne({ where: { role } });
         if (!rolePermissions) {

@@ -11,4 +11,4 @@ export {
   getAllPermissions,
   getPermissionsForRole,
   updatePermissionsForRole,
-} from "../controllers/permission.controller";
+} from "./permission.controller.js";

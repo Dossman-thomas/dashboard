@@ -2,9 +2,9 @@ import { messages } from "../messages/index.js";
 import { response } from "../utils/index.js";
 import {
   getPermissionsForUser,
-  getAllPermissions,
-  getPermissionsForRole,
-  updatePermissionsForRole,
+  getAllPermissionsService, 
+  getPermissionsForRoleService,
+  updatePermissionsForRoleService,
 } from "../services/index.js";
 
 // Get permissions for a specific user
@@ -34,7 +34,7 @@ export const getPermissions = async (req, res) => {
 // Retrieve all permissions
 export const getAllPermissions = async (req, res) => {
     try {
-      const permissions = await getAllPermissions();
+      const permissions = await getAllPermissionsService();
       if (!permissions.length) {
         return response(res, {
           statusCode: 404,
@@ -58,7 +58,7 @@ export const getAllPermissions = async (req, res) => {
   // Get permissions for a specific role
   export const getPermissionsForRole = async (req, res) => {
     try {
-      const rolePermissions = await getPermissionsForRole(req.params.role);
+      const rolePermissions = await getPermissionsForRoleService(req.params.role);
       if (!rolePermissions) {
         return response(res, {
           statusCode: 404,
@@ -82,7 +82,7 @@ export const getAllPermissions = async (req, res) => {
   // Update permissions for a specific role
   export const updatePermissionsForRole = async (req, res) => {
     try {
-      const updatedPermissions = await updatePermissionsForRole(req.params.role, req.body);
+      const updatedPermissions = await updatePermissionsForRoleService(req.params.role, req.body);
       return response(res, {
         statusCode: 200,
         message: messages.general.SUCCESS,
