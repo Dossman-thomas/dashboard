@@ -45,7 +45,7 @@ export class CreateRecordComponent implements OnInit {
       // Call the service to create the user
       this.userService.createUser(newUser).subscribe({
         next: () => {
-          console.log('User created:', newUser);
+          console.log('User created successfully!');
           this.createUserForm.reset(); // Reset the form after submission
           this.redirectToDash();
         },
