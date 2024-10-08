@@ -53,19 +53,27 @@ export class DashboardComponent implements OnInit {
 
   // Method to fetch users via UserService
   fetchUsers(): void {
-    this.userService.getAllUsers().subscribe(
-      (users: User[]) => {
-        this.users = users;
-        this.totalUsers = users.length;
-        this.rowData = users;
-        this.adminCount = users.filter(user => user.role === 'admin').length;
-        this.dataManagerCount = users.filter(user => user.role === 'data manager').length;
-        this.employeeCount = users.filter(user => user.role === 'employee').length;
+    this.userService.getAllUsers().subscribe({
+      next: (users: User[]) => {
+        // Check if users is an array
+        if (Array.isArray(users)) {
+          this.users = users;
+          this.totalUsers = users.length;
+          this.rowData = users; // Ensure rowData is set to an array
+          this.adminCount = users.filter(user => user.role === 'admin').length;
+          this.dataManagerCount = users.filter(user => user.role === 'data manager').length;
+          this.employeeCount = users.filter(user => user.role === 'employee').length;
+        } else {
+          console.error('Expected an array but got:', users);
+          // Handle the unexpected data structure as needed
+        }
       },
-      (error) => {
+      error: (error) => {
         console.error('Failed to fetch users:', error);
         // Handle the error (e.g., show a notification or retry logic)
       }
-    );
+    });
   }
+  
+  
 }

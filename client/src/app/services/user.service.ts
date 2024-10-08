@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import {
+  Observable,
+  BehaviorSubject,
+  of,
+  map,
+  catchError,
+  throwError,
+} from 'rxjs';
 // import { catchError, map } from 'rxjs/operators';
 
 export interface User {
@@ -14,7 +21,7 @@ export interface User {
   providedIn: 'root',
 })
 export class UserService {
-  private baseUrl = 'http://localhost:3000/api/users';
+  private baseUrl = 'http://localhost:5000/api/users';
 
   // Define the currentUserSubject as a BehaviorSubject
   private currentUserSubject: BehaviorSubject<User | null>;
@@ -51,7 +58,21 @@ export class UserService {
 
   // Create a new user
   createUser(userData: User): Observable<User> {
-    return this.http.post<User>(`${this.baseUrl}/create-new`, userData);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    return this.http
+      .post<any>(`${this.baseUrl}/create-new`, userData, { headers })
+      .pipe(
+        map((res: User): User => {
+          return res;
+        }),
+        catchError((error) => {
+          console.error('Error creating user:', error); // Log the error
+          return throwError(
+            () => new Error('Failed to create user. Please try again later.')
+          );
+        })
+      );
   }
 
   // Get a user by ID
@@ -61,7 +82,15 @@ export class UserService {
 
   // Get all users
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}`);
+    return this.http.get<any>(`${this.baseUrl}`).pipe(
+      map((res) => res.data), // Extract the 'data' property
+      catchError((error) => {
+        console.log('Error fetching users:', error); // Log the error
+        return throwError(
+          () => new Error('Failed to fetch users. Please try again later.')
+        ); // Return an observable error
+      })
+    );
   }
 
   // Update a user by ID
