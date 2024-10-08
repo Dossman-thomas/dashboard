@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { UserService } from './user.service'; // Update with the correct path
 import { CookieService } from 'ngx-cookie-service';
+import * as bcrypt from 'bcryptjs'; // Import bcryptjs
 
 @Injectable({
   providedIn: 'root', // Service is available globally
@@ -37,33 +38,42 @@ export class AuthService {
     }
   }
 
+  // Login method with password hashing check
   login(email: string, password: string, rememberMe: boolean) {
-    this.userService.getAllUsers().subscribe((users) => {
-      const user = users.find(
-        (u) => u.email === email && u.password === password
-      );
+    this.userService.getAllUsers().subscribe(async (users) => {
+      const user = users.find((u) => u.email === email);
 
       if (user) {
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Compare the input password with the stored hashed password
+        const passwordMatch = await bcrypt.compare(password, user.password);
 
-        if (rememberMe) {
-          // store email, password, and rememberMe in cookies to expire in 90 days
-          this.cookieService.set('email', email, 90);
-          this.cookieService.set('password', password, 90);
-          this.cookieService.set('rememberMe', 'true', 90);
+        if (passwordMatch) {
+          // Store the user details in local storage upon successful login
+          localStorage.setItem('currentUser', JSON.stringify(user));
+
+          if (rememberMe) {
+            // Store email, password (still in plain text), and rememberMe in cookies to expire in 90 days
+            this.cookieService.set('email', email, 90);
+            this.cookieService.set('password', password, 90); // Note: Consider hashing password in cookies for security
+            this.cookieService.set('rememberMe', 'true', 90);
+          } else {
+            // Delete cookies if rememberMe is false (unchecked)
+            this.cookieService.delete('email');
+            this.cookieService.delete('password');
+            this.cookieService.delete('rememberMe');
+          }
+
+          // Update logged in state and navigate to dashboard
+          this.isLoggedInSubject.next(true);
+          this.userService.setCurrentUser(user);
+          alert('Logged in successfully');
+          this.router.navigate(['/dashboard']);
         } else {
-          // delete cookies if rememberMe is false(unchecked)
-          this.cookieService.delete('email');
-          this.cookieService.delete('password');
-          this.cookieService.delete('rememberMe');
+          // Password mismatch
+          alert('Invalid credentials');
         }
-
-        this.isLoggedInSubject.next(true);
-        this.userService.setCurrentUser(user);
-        alert('Logged in successfully');
-        this.router.navigate(['/dashboard']);
       } else {
-        // Handle invalid credentials
+        // Email not found
         alert('Invalid credentials');
       }
     });

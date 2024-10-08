@@ -8,7 +8,7 @@ import {
   catchError,
   throwError,
 } from 'rxjs';
-// import { catchError, map } from 'rxjs/operators';
+
 
 export interface User {
   id?: number;
@@ -22,9 +22,11 @@ export interface User {
 })
 export class UserService {
   private baseUrl = 'http://localhost:5000/api/users';
+  private headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
   // Define the currentUserSubject as a BehaviorSubject
   private currentUserSubject: BehaviorSubject<User | null>;
+  
   // Define currentUser$ as an Observable for the current user
   public currentUser$: Observable<User | null>;
 
@@ -58,10 +60,9 @@ export class UserService {
 
   // Create a new user
   createUser(userData: User): Observable<User> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http
-      .post<any>(`${this.baseUrl}/create-new`, userData, { headers })
+      .post<any>(`${this.baseUrl}/create-new`, userData, { headers: this.headers })
       .pipe(
         map((res: User): User => {
           return res;
@@ -95,12 +96,31 @@ export class UserService {
 
   // Update a user by ID
   updateUser(id: number, userData: User): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/update/${id}`, userData);
+
+    return this.http
+      .put<User>(`${this.baseUrl}/users/${id}`, userData, { headers: this.headers })
+      .pipe(
+        // No need for map if the API returns the updated user directly
+        catchError((error) => {
+          console.error('Error updating user:', error);
+          return throwError(
+            () => new Error('Failed to update user. Please try again later.')
+          );
+        })
+      );
   }
 
   // Delete a user by ID
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`);
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/users/${id}`).pipe(
+      // Depending on what the API returns, you might not need map
+      catchError((error) => {
+        console.error('Error deleting user:', error);
+        return throwError(
+          () => new Error('Failed to delete user. Please try again later.')
+        );
+      })
+    );
   }
 
   // Verify user password (if you choose to implement it)
