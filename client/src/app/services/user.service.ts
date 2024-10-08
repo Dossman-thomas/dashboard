@@ -9,7 +9,6 @@ import {
   throwError,
 } from 'rxjs';
 
-
 export interface User {
   id?: number;
   name: string;
@@ -26,7 +25,7 @@ export class UserService {
 
   // Define the currentUserSubject as a BehaviorSubject
   private currentUserSubject: BehaviorSubject<User | null>;
-  
+
   // Define currentUser$ as an Observable for the current user
   public currentUser$: Observable<User | null>;
 
@@ -60,9 +59,10 @@ export class UserService {
 
   // Create a new user
   createUser(userData: User): Observable<User> {
-
     return this.http
-      .post<any>(`${this.baseUrl}/create-new`, userData, { headers: this.headers })
+      .post<any>(`${this.baseUrl}/create-new`, userData, {
+        headers: this.headers,
+      })
       .pipe(
         map((res: User): User => {
           return res;
@@ -78,7 +78,15 @@ export class UserService {
 
   // Get a user by ID
   getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/${id}`);
+    return this.http.get<User>(`${this.baseUrl}/${id}`).pipe(
+      map((res) => res), // Extract the response
+      catchError((error) => {
+        console.error('Error fetching user:', error); // Log the error
+        return throwError(
+          () => new Error('Failed to fetch user. Please try again later.')
+        ); // Return an observable error
+      })
+    );
   }
 
   // Get all users
@@ -96,9 +104,10 @@ export class UserService {
 
   // Update a user by ID
   updateUser(id: number, userData: User): Observable<User> {
-
     return this.http
-      .put<User>(`${this.baseUrl}/users/${id}`, userData, { headers: this.headers })
+      .put<User>(`${this.baseUrl}/update/${id}`, userData, {
+        headers: this.headers,
+      })
       .pipe(
         // No need for map if the API returns the updated user directly
         catchError((error) => {
@@ -112,8 +121,11 @@ export class UserService {
 
   // Delete a user by ID
   deleteUser(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/users/${id}`).pipe(
-      // Depending on what the API returns, you might not need map
+    return this.http.delete<any>(`${this.baseUrl}/delete/${id}`).pipe(
+      map((res) => {
+        console.log('User deleted successfully', res);
+        return res; // Ensure this returns the expected response
+      }),
       catchError((error) => {
         console.error('Error deleting user:', error);
         return throwError(
