@@ -35,14 +35,14 @@ export class CreateRecordComponent implements OnInit {
 
   onCreateUser(): void {
     if (this.createUserForm.valid) {
-      const newUser: User = {
-        id: this.generateNewId(),
+      const newUser: Omit<User, 'id'> = {
         name: this.createUserForm.value.name,
         email: this.createUserForm.value.email,
         role: this.createUserForm.value.role,
         password: this.createUserForm.value.password
       };
       
+      // Call the service to create the user
       this.userService.createUser(newUser).subscribe({
         next: () => {
           console.log('User created:', newUser);
@@ -55,14 +55,19 @@ export class CreateRecordComponent implements OnInit {
       });
     }
   }
+  
 
   redirectToDash(): void {
     this.router.navigate(['/dashboard']);
   }
 
-  private generateNewId(): number {
-    return Math.max(...this.userService.getCurrentUsers().map(user => user.id)) + 1;
-  }
+  // private generateNewId(): void {
+  //   this.userService.getCurrentUsers().subscribe(users => {
+  //     const newId = Math.max(...users.map(user => user.id)) + 1;
+  //     this.createUserForm.patchValue({ id: newId });
+  //   });
+  // }
+  
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;

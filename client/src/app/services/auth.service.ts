@@ -38,7 +38,7 @@ export class AuthService {
   }
 
   login(email: string, password: string, rememberMe: boolean) {
-    this.userService.getUsers().subscribe((users) => {
+    this.userService.getAllUsers().subscribe((users) => {
       const user = users.find(
         (u) => u.email === email && u.password === password
       );

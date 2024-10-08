@@ -71,17 +71,23 @@ export class MyAccountComponent implements OnInit {
         name: this.userForm.value.name,
         email: this.userForm.value.email,
       };
-
-      this.userService.updateUser(updatedUser).subscribe({
-        next: (user) => {
-          console.log('User updated:', user);
-          alert('Your profile was updated successfully.');
-          this.isEditing = false;
-        },
-        error: (error) => {
-          console.error('Error updating user:', error);
-        },
-      });
+  
+      // Ensure currentUser.id is defined and is a number
+      if (this.currentUser.id !== undefined) {
+        // Call updateUser with both id and updatedUser
+        this.userService.updateUser(this.currentUser.id, updatedUser).subscribe({
+          next: (user) => {
+            console.log('User updated:', user);
+            alert('Your profile was updated successfully.');
+            this.isEditing = false;
+          },
+          error: (error) => {
+            console.error('Error updating user:', error);
+          },
+        });
+      } else {
+        console.error('User ID is undefined');
+      }
     }
   }
 
@@ -113,17 +119,26 @@ export class MyAccountComponent implements OnInit {
     }
 
     // Update password
-    this.currentUser.password = newPassword;
-    this.userService.updateUser(this.currentUser).subscribe({
-      next: () => {
-        console.log('Password updated successfully.');
-        this.onCancelPasswordChange();
-      },
-      error: (error) => {
-        console.error('Error updating password:', error);
-        this.passwordError = 'Failed to update password.';
-      },
-    });
+    const updatedUser: User = {
+      ...this.currentUser,
+      password: newPassword, // Update the password
+    };
+
+    if (this.currentUser.id) {
+      this.userService.updateUser(this.currentUser.id, updatedUser).subscribe({
+        next: () => {
+          console.log('Password updated successfully.');
+          this.onCancelPasswordChange();
+          alert('Your password was updated successfully.');
+        },
+        error: (error) => {
+          console.error('Error updating password:', error);
+          this.passwordError = 'Failed to update password.';
+        },
+      });
+    } else {
+      console.error('User ID is undefined');
+    }
   }
 
   togglePasswordVisibility() {

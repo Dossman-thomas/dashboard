@@ -8,17 +8,16 @@ import { AgGridAngular } from 'ag-grid-angular';
 @Component({
   selector: 'app-update-record',
   templateUrl: './update-record.component.html',
-  styleUrls: ['./update-record.component.css']
+  styleUrls: ['./update-record.component.css'],
 })
 export class UpdateRecordComponent implements OnInit {
-  
   @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
 
   users: User[] = [];
   selectedUser: User = { id: 0, name: '', email: '', password: '', role: '' };
-  gridApi!: GridApi;
+  gridApi!: GridApi<User>;
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   paginationPageSizeSelector = [10, 25, 50, 100];
   paginationPageSize = 25;
@@ -28,7 +27,7 @@ export class UpdateRecordComponent implements OnInit {
     flex: 1,
     filter: true,
     sortable: true,
-    editable: true // Make all columns editable
+    editable: true, // Make all columns editable
   };
 
   colDefs: ColDef[] = [
@@ -43,20 +42,20 @@ export class UpdateRecordComponent implements OnInit {
   }
 
   fetchUsers() {
-    this.userService.getUsers().subscribe({
+    this.userService.getAllUsers().subscribe({
       next: (users) => {
         this.users = users;
         if (this.gridApi) {
-          // Use setGridOptions to update row data
+          // Use setRowData instead of setGridOption
           this.gridApi.updateGridOptions({
-            rowData: this.users
+            rowData: this.users,
           });
         }
         console.log('Users:', this.users);
       },
       error: (error) => {
         console.error('Error fetching users:', error);
-      }
+      },
     });
   }
 
@@ -95,15 +94,21 @@ export class UpdateRecordComponent implements OnInit {
   // }
 
   onCellValueChanged(event: any): void {
-    const updatedUser = event.data as User;
-    this.userService.updateUser(updatedUser).subscribe({
-      next: () => {
-        console.log('User updated:', updatedUser);
-        alert('User updated successfully!');
-      },
-      error: (error) => {
-        console.error('Error updating user:', error);
-      }
-    });
+    const updatedUser: User = event.data as User;
+
+    // Check if id is defined
+    if (updatedUser.id) {
+      this.userService.updateUser(updatedUser.id, updatedUser).subscribe({
+        next: () => {
+          console.log('User updated:', updatedUser);
+          alert('User updated successfully!');
+        },
+        error: (error) => {
+          console.error('Error updating user:', error);
+        },
+      });
+    } else {
+      console.error('User ID is undefined');
+    }
   }
 }

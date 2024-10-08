@@ -1,42 +1,101 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+// import { catchError, map } from 'rxjs/operators';
 
+export interface User {
+  id?: number;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+}
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  private baseUrl = 'http://localhost:3000/api/users';  // Adjust this URL based on your backend port
+  private baseUrl = 'http://localhost:3000/api/users';
 
-  constructor(private http: HttpClient) {}
+  // Define the currentUserSubject as a BehaviorSubject
+  private currentUserSubject: BehaviorSubject<User | null>;
+  // Define currentUser$ as an Observable for the current user
+  public currentUser$: Observable<User | null>;
+
+  constructor(private http: HttpClient) {
+    const currentUser = localStorage.getItem('currentUser');
+    this.currentUserSubject = new BehaviorSubject<User | null>(
+      currentUser ? JSON.parse(currentUser) : null
+    );
+    this.currentUser$ = this.currentUserSubject.asObservable();
+  }
+
+  // Method to get the current user
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  // Set the current user and update localStorage
+  setCurrentUser(user: User | null): void {
+    if (user) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('currentUser');
+    }
+    this.currentUserSubject.next(user);
+  }
+
+  // Get the current user value
+  getCurrentUsers(): Observable<User[]> {
+    return this.getAllUsers(); // Call the existing method to fetch users
+  }
 
   // Create a new user
-  createUser(userData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/create-new`, userData);
+  createUser(userData: User): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/create-new`, userData);
   }
 
   // Get a user by ID
-  getUserById(id: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${id}`);
+  getUserById(id: number): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/${id}`);
   }
 
   // Get all users
-  getAllUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}`);
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}`);
   }
 
   // Update a user by ID
-  updateUser(id: string, userData: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/update/${id}`, userData);
+  updateUser(id: number, userData: User): Observable<User> {
+    return this.http.put<User>(`${this.baseUrl}/update/${id}`, userData);
   }
 
   // Delete a user by ID
-  deleteUser(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/delete/${id}`);
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`);
   }
 
   // Verify user password (if you choose to implement it)
-  verifyPassword(id: string, passwordData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/verify-password`, passwordData);
+  verifyPassword(
+    id: number,
+    passwordData: { password: string }
+  ): Observable<boolean> {
+    return this.http.post<boolean>(
+      `${this.baseUrl}/${id}/verify-password`,
+      passwordData
+    );
+  }
+
+  // Logout and clear the user from localStorage
+  logout(): void {
+    localStorage.removeItem('currentUser');
+    this.setCurrentUser(null); // Clears the current user in the BehaviorSubject
+  }
+
+  // Error handling method
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(error);
+      return of(result as T);
+    };
   }
 }

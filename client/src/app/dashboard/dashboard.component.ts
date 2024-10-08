@@ -47,14 +47,25 @@ export class DashboardComponent implements OnInit {
       this.firstName = 'User';
     }
 
-    // Fetch users from UserService
-    this.userService.getUsers().subscribe(users => {
-      this.users = users;
-      this.totalUsers = this.users.length;
-      this.rowData = this.users;
-      this.adminCount = this.users.filter(user => user.role === 'admin').length;
-      this.dataManagerCount = this.users.filter(user => user.role === 'data manager').length;
-      this.employeeCount = this.users.filter(user => user.role === 'employee').length;
-    });
+    // Fetch users from the API
+    this.fetchUsers();
+  }
+
+  // Method to fetch users via UserService
+  fetchUsers(): void {
+    this.userService.getAllUsers().subscribe(
+      (users: User[]) => {
+        this.users = users;
+        this.totalUsers = users.length;
+        this.rowData = users;
+        this.adminCount = users.filter(user => user.role === 'admin').length;
+        this.dataManagerCount = users.filter(user => user.role === 'data manager').length;
+        this.employeeCount = users.filter(user => user.role === 'employee').length;
+      },
+      (error) => {
+        console.error('Failed to fetch users:', error);
+        // Handle the error (e.g., show a notification or retry logic)
+      }
+    );
   }
 }

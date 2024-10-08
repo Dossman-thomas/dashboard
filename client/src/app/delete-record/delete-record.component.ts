@@ -10,6 +10,7 @@ import { DeleteButtonRendererComponent } from '../delete-button-renderer/delete-
 })
 export class DeleteRecordComponent implements OnInit {
   users: User[] = [];
+  rowData: User[] = [];
 
   constructor(private userService: UserService) { }
 
@@ -40,21 +41,26 @@ export class DeleteRecordComponent implements OnInit {
     },
   ];
 
-  rowData: User[] = [];
-
-
   ngOnInit() {
-    this.userService.getUsers().subscribe(users => {
-      this.users = users;
+    // Fetch all users and set the rowData for the AG Grid
+    this.userService.getAllUsers().subscribe(users => {
+      this.users = users;  // Store the fetched users
+      this.rowData = [...this.users];  // Set the rowData for the grid
     });
   }
 
+  // Method to handle deletion of a user
   onDelete(userId: number): void {
     if (confirm('Are you sure you want to delete this record?')) {
       this.userService.deleteUser(userId).subscribe(() => {
+        // Remove the user from the array after successful deletion
         this.users = this.users.filter(user => user.id !== userId);
+        this.rowData = [...this.users];  // Update the rowData for the AG Grid
+      }, error => {
+        console.error('Error deleting user:', error);  // Handle errors
       });
     }
   }
+  
 
 }
