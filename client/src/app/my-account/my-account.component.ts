@@ -8,6 +8,7 @@ import { UserService, User } from '../services/user.service';
   styleUrls: ['./my-account.component.css'],
 })
 export class MyAccountComponent implements OnInit {
+  
   currentUser: User | null = null;
   isEditing = false;
   isChangingPassword = false;
@@ -102,7 +103,7 @@ export class MyAccountComponent implements OnInit {
   }
 
   onSubmitNewPassword(): void {
-    if (!this.currentUser) return;
+    if (!this.currentUser) return; // if currentUser is null, exit early
 
     const { currentPassword, newPassword, confirmNewPassword } = this.passwordForm.value;
 
