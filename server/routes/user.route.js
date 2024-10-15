@@ -6,6 +6,7 @@ import {
   getAllUsers,
   updateUser,
   deleteUser,
+  getCurrentUser,
   loginUser,
 } from "../controllers/index.js";
 
@@ -25,6 +26,12 @@ userRouter.put('/update/:id', authenticateJWT, updateUser); // endpoint: /api/us
 
 // Delete a user by ID route
 userRouter.delete('/delete/:id', authenticateJWT, deleteUser); // endpoint: /api/users/delete/:id
+
+// Fetch current User
+userRouter.get('/me', authenticateJWT, getCurrentUser); // endpoint: /api/users/me
+
+// Login user route
+userRouter.post('/login', loginUser); // endpoint: /api/users/login
 
 // // Verify user password route
 // userRouter.post('/:id/verify-password', verifyUserPassword); // endpoint: /api/users/:id/verify-password

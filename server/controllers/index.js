@@ -4,7 +4,8 @@ export {
   getAllUsers,
   updateUser,
   deleteUser,
-  verifyUserPassword,
+  getCurrentUser,
+  loginUser,
 } from './user.controller.js';
 export {
   getPermissions,

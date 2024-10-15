@@ -4,7 +4,7 @@ export {
   getAllUsersService,
   updateUserService,
   deleteUserService,
-  verifyUserPasswordService,
+  authenticateUserService,
 } from "./user.service.js";
 
 export {

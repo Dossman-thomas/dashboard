@@ -3,7 +3,7 @@ import { response } from "../utils/index.js";
 import { messages } from "../messages/index.js";
 
 export const authenticateJWT = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = req.headers.authorization?.split(" ")[1]; // Get token from the Authorization header
   
     if (!token) {
       return response(res, {

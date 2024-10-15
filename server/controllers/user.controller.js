@@ -42,6 +42,31 @@ export const loginUser = async (req, res) => {
   }
 };
 
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await getUserByIdService(req.user.id);
+    
+    if (!user) {
+      return response(res, {
+        statusCode: 404,
+        message: messages.general.USER_NOT_FOUND,
+      });
+    }
+
+    return response(res, {
+      statusCode: 200,
+      message: messages.general.SUCCESS,
+      data: user,
+    });
+  } catch (error) {
+    console.error(error);
+    return response(res, {
+      statusCode: 500,
+      message: messages.general.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
 // create a new user
 export const createUser = async (req, res) => {
   try {
@@ -192,11 +217,11 @@ export const deleteUser = async (req, res) => {
 // Verify user password
 export const verifyUserPassword = async (req, res) => {
   try {
-    const isValidPassword = await verifyUserPasswordService(
-      req.body.username,
+    const user = await authenticateUserServiceService(
+      req.body.email,
       req.body.password
     );
-    if (!isValidPassword) {
+    if (!user) {
       return response(res, {
         statusCode: 401,
         message: messages.general.INVALID_CREDENTIALS,
