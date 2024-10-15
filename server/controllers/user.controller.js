@@ -6,8 +6,41 @@ import {
   getAllUsersService,
   updateUserService,
   deleteUserService,
-  verifyUserPasswordService,
+  authenticateUserService,
 } from "../services/index.js";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret"; 
+
+// Login user
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await authenticateUserService(email, password);
+    if (!user) {
+      return response(res, {
+        statusCode: 401,
+        message: messages.general.INVALID_CREDENTIALS,
+      });
+    }
+
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "1h", // token expires in 1 hour
+    });
+
+    return response(res, {
+      statusCode: 200,
+      message: messages.general.SUCCESS,
+      data: { token, user },
+    });
+  } catch (error) {
+    console.error(error);
+    return response(res, {
+      statusCode: 500,
+      message: messages.general.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
 
 // create a new user
 export const createUser = async (req, res) => {

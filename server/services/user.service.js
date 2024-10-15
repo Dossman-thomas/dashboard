@@ -92,14 +92,25 @@ export const deleteUserService = async (id) => {
 };
 
 // Verify user password
-export const verifyUserPasswordService = async (id, password) => {
+export const authenticateUserService = async (email, password) => {
   try {
-    const user = await UserModel.findByPk(id);
+    // Find the user by email (instead of id)
+    const user = await UserModel.findOne({ where: { email } });
+
     if (!user) {
       throw new Error("User not found");
     }
+
+    // Compare the provided password with the hashed password stored in the database
     const isValid = await bcrypt.compare(password, user.password);
-    return isValid;
+
+    // If the password is valid, return the user object
+    if (isValid) {
+      return user;
+    } else {
+      // If the password is invalid, return null
+      return null;
+    }
   } catch (error) {
     throw new Error(error);
   }
