@@ -24,6 +24,8 @@ export const loginUser = async (req, res) => {
       });
     }
 
+    console.log(user.id); 
+
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
       expiresIn: "1h", // token expires in 1 hour
     });
@@ -44,7 +46,11 @@ export const loginUser = async (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await getUserByIdService(req.user.id);
+
+    console.log(req.params.id);
+    
+    // Fetch the user by ID
+    const user = await getUserByIdService(req.params.id); // req.user is set by the authenticateJWT middleware
     
     if (!user) {
       return response(res, {
@@ -53,6 +59,7 @@ export const getCurrentUser = async (req, res) => {
       });
     }
 
+    // Respond with the current user's details
     return response(res, {
       statusCode: 200,
       message: messages.general.SUCCESS,
@@ -142,7 +149,7 @@ export const getAllUsers = async (req, res) => {
     const users = await getAllUsersService({
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      searchQuery,
+      searchQuery: search,
       sortBy,
       order,
     });
@@ -217,7 +224,7 @@ export const deleteUser = async (req, res) => {
 // Verify user password
 export const verifyUserPassword = async (req, res) => {
   try {
-    const user = await authenticateUserServiceService(
+    const user = await authenticateUserService(
       req.body.email,
       req.body.password
     );
