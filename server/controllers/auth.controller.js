@@ -2,7 +2,7 @@ import { response } from "../utils/index.js";
 import { authenticateUserService } from "../services/auth.service.js"; // Import the authentication service
 import jwt from "jsonwebtoken"; // Ensure you import jwt for token generation
 import { messages } from "../messages/index.js"; // Import your messages
-import { env } from "../config/env.config.js"; // Import your environment variables for JWT secret
+
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -22,7 +22,7 @@ export const loginUser = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email }, // Payload
-      env.server.JWT_SECRET, // Use your environment variable for the secret
+      process.env.JWT_SECRET, // Use your environment variable for the secret
       { expiresIn: "1h" } // Token expiration time
     );
 
@@ -30,7 +30,7 @@ export const loginUser = async (req, res) => {
     return response(res, {
       statusCode: 200,
       message: messages.general.SUCCESS,
-      data: { token, user }, // Return the token and user data
+      data: user, // Send the user object
     });
   } catch (error) {
     console.error(error);

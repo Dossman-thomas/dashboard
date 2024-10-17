@@ -1,3 +1,6 @@
+// Initiate all controllers here
+
+// Users
 export {
   createUser,
   getUserById,
@@ -5,11 +8,15 @@ export {
   updateUser,
   deleteUser,
   getCurrentUser,
-  loginUser,
 } from './user.controller.js';
+
+// Permissions
 export {
   getPermissions,
   getAllPermissions,
   getPermissionsForRole,
   updatePermissionsForRole,
 } from "./permission.controller.js";
+
+// Auth
+export { loginUser } from "./auth.controller.js";

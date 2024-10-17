@@ -4,7 +4,6 @@ export {
   getAllUsersService,
   updateUserService,
   deleteUserService,
-  authenticateUserService,
 } from "./user.service.js";
 
 export {
