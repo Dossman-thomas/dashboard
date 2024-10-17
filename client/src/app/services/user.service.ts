@@ -19,9 +19,14 @@ export interface User {
 @Injectable({
   providedIn: 'root',
 })
-export class UserService {
+export class UserService { 
+
   private baseUrl = 'http://localhost:5000/api/users';
-  private headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+  private headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + localStorage.getItem('token'),
+  });
 
   // Define the currentUserSubject as a BehaviorSubject
   private currentUserSubject: BehaviorSubject<User | null>;

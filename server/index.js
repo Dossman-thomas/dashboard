@@ -22,9 +22,9 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use('/api', routes);
 
-app.use('/', (req, res) => {
-  return res.status(200).send('OK');
-});
+// app.use('/', (req, res) => {
+//   return res.status(200).send('OK');
+// });
 
 app.use((err, req, res, next) => {
   console.error(err);
