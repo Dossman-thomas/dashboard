@@ -27,8 +27,6 @@ export const getUserByIdService = async (id) => {
   }
 };
 
-
-
 // // Get all users
 // export const getAllUsersService = async () => {
 //   try {
@@ -93,7 +91,7 @@ export const deleteUserService = async (id) => {
   }
 };
 
-// Verify user password
+// authenticate user
 export const authenticateUserService = async (email, password) => {
   try {
     // Find the user by email (instead of id)
@@ -111,7 +109,7 @@ export const authenticateUserService = async (email, password) => {
       return user;
     } else {
       // If the password is invalid, return null
-      return null;
+      throw new Error("Invalid password");
     }
   } catch (error) {
     throw new Error(error);
