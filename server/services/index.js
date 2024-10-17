@@ -13,3 +13,5 @@ export {
   getPermissionsForRoleService,
   updatePermissionsForRoleService,
 } from "./permission.service.js";
+
+export { authenticateUserService } from "./auth.service.js";

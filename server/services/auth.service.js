@@ -1,52 +1,34 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { messages } from "../messages/index.js";
-import { response } from "../utils/index.js";
 import { UserModel } from "../database/models/user.model.js";
 
 export const authenticateUserService = async (email, password) => {
   try {
-
-    const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret"; // Use the environment variable JWT_SECRET or a default value
-
     // Find the user by email
     const user = await UserModel.findOne({ where: { email } });
 
     if (!user) {
-        return response(res, {
-          statusCode: 404,
-          message: messages.general.USER_NOT_FOUND,
-        });
-      }
+      throw new Error(messages.general.USER_NOT_FOUND); // Throw error if user not found
+    }
 
     // Compare the provided password with the hashed password stored in the database
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      return response(res, {
-        statusCode: 401,
-        message: messages.general.INVALID_CREDENTIAL,
-      });
+      throw new Error(messages.general.INVALID_CREDENTIAL); // Throw error if credentials are invalid
     }
 
     // If the password is valid, generate JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role }, // Payload (you can customize this)
-      process.env.JWT_SECRET, // Secret key (make sure to add this in your .env file)
+      { id: user.id, email: user.email }, // Payload
+      process.env.JWT_SECRET, // Secret key from environment variables
       { expiresIn: "1h" } // Token expiration
     );
 
     // Return the user object and the token
-    return response(res, {
-        statusCode: 200,
-        message: messages.general.SUCCESS,
-        data: { token, user },
-      });
+    return { token, user }; // Return token and user object
   } catch (error) {
-    console.error(error);
-    return response(res, {
-      statusCode: 500,
-      message: messages.general.INTERNAL_SERVER_ERROR,
-    });
+    throw new Error(error.message); // Throw error for handling in the controller
   }
 };
