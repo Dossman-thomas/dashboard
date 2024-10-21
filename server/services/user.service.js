@@ -43,7 +43,7 @@ export const getAllUsersService = async ({
   limit,
   searchQuery,
   sortBy,
-  order, 
+  order,
 }) => {
   try {
     const users = await UserModel.findAndCountAll({
@@ -59,6 +59,9 @@ export const getAllUsersService = async ({
 
     return users;
   } catch (error) {
+    console.log("Model:", UserModel); // Check if the model is correctly defined
+    console.log("params:", { page, limit, searchQuery, sortBy, order }); // Log the parameters for debugging
+    console.log("Error:", error); // Log the error for debugging
     throw new Error(error.message);
   }
 };
@@ -90,4 +93,3 @@ export const deleteUserService = async (id) => {
     throw new Error(error);
   }
 };
-

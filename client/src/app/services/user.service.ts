@@ -19,14 +19,17 @@ export interface User {
 @Injectable({
   providedIn: 'root',
 })
-export class UserService { 
-
+export class UserService {
   private baseUrl = 'http://localhost:5000/api/users';
 
-  private headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: 'Bearer ' + localStorage.getItem('token'),
-  });
+  // Helper method to get the Authorization header
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`, // Use JWT token
+    });
+  }
 
   // Define the currentUserSubject as a BehaviorSubject
   private currentUserSubject: BehaviorSubject<User | null>;
@@ -66,14 +69,14 @@ export class UserService {
   createUser(userData: User): Observable<User> {
     return this.http
       .post<any>(`${this.baseUrl}/create-new`, userData, {
-        headers: this.headers,
+        headers: this.getHeaders(),
       })
       .pipe(
         map((res: User): User => {
           return res;
         }),
         catchError((error) => {
-          console.error('Error creating user:', error); // Log the error
+          console.error('Error creating user:', error);
           return throwError(
             () => new Error('Failed to create user. Please try again later.')
           );
@@ -83,35 +86,39 @@ export class UserService {
 
   // Get a user by ID
   getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/${id}`).pipe(
-      map((res) => res), // Extract the response
-      catchError((error) => {
-        console.error('Error fetching user:', error); // Log the error
-        return throwError(
-          () => new Error('Failed to fetch user. Please try again later.')
-        ); // Return an observable error
-      })
-    );
+    return this.http
+      .get<User>(`${this.baseUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(
+        map((res) => res), // Extract the response
+        catchError((error) => {
+          console.error('Error fetching user:', error); // Log the error
+          return throwError(
+            () => new Error('Failed to fetch user. Please try again later.')
+          ); // Return an observable error
+        })
+      );
   }
 
   // Get all users
   getAllUsers(): Observable<User[]> {
-    return this.http.get<any>(`${this.baseUrl}`).pipe(
-      map((res) => res.data), // Extract the 'data' property
-      catchError((error) => {
-        console.log('Error fetching users:', error); // Log the error
-        return throwError(
-          () => new Error('Failed to fetch users. Please try again later.')
-        ); // Return an observable error
-      })
-    );
+    return this.http
+      .get<any>(`${this.baseUrl}`, { headers: this.getHeaders() })
+      .pipe(
+        map((res) => res.data), // Extract the 'data' property
+        catchError((error) => {
+          console.log('Error fetching users:', error); // Log the error
+          return throwError(
+            () => new Error('Failed to fetch users. Please try again later.')
+          ); // Return an observable error
+        })
+      );
   }
 
   // Update a user by ID
   updateUser(id: number, userData: User): Observable<User> {
     return this.http
       .put<User>(`${this.baseUrl}/update/${id}`, userData, {
-        headers: this.headers,
+        headers: this.getHeaders(),
       })
       .pipe(
         // No need for map if the API returns the updated user directly
@@ -126,18 +133,22 @@ export class UserService {
 
   // Delete a user by ID
   deleteUser(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/delete/${id}`).pipe(
-      map((res) => {
-        console.log('User deleted successfully', res);
-        return res; // Ensure this returns the expected response
-      }),
-      catchError((error) => {
-        console.error('Error deleting user:', error);
-        return throwError(
-          () => new Error('Failed to delete user. Please try again later.')
-        );
+    return this.http
+      .delete<any>(`${this.baseUrl}/delete/${id}`, {
+        headers: this.getHeaders(),
       })
-    );
+      .pipe(
+        map((res) => {
+          console.log('User deleted successfully', res);
+          return res;
+        }),
+        catchError((error) => {
+          console.error('Error deleting user:', error);
+          return throwError(
+            () => new Error('Failed to delete user. Please try again later.')
+          );
+        })
+      );
   }
 
   // Verify user password (if you choose to implement it)
