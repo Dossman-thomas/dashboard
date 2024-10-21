@@ -36,37 +36,49 @@ export class AuthService {
   }
 
   // Updated login method to handle JWT token
-  login(email: string, password: string, rememberMe: boolean) {
+  login(email: string, password: string, rememberMe: boolean): void {
     const loginData = { email, password };
     const headers = { 'Content-Type': 'application/json' };
-
+  
     this.http.post<any>('http://localhost:5000/api/auth/login', loginData, { headers })
-      .subscribe(response => {
-        const { token, user } = response.data;
-
-        // Store the token in localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-
-        if (rememberMe) {
-          this.cookieService.set('email', email, 90);
-          this.cookieService.set('password', password, 90);
-          this.cookieService.set('rememberMe', 'true', 90);
-        } else {
-          this.cookieService.delete('email');
-          this.cookieService.delete('password');
-          this.cookieService.delete('rememberMe');
+      .subscribe({
+        next: (response) => {
+          const { token, user } = response.data;
+  
+          // Store the token and user in localStorage
+          localStorage.setItem('token', token);
+          localStorage.setItem('currentUser', JSON.stringify(user));
+  
+          // Handle "Remember Me" functionality
+          if (rememberMe) {
+            this.cookieService.set('email', email, 90);  // Save email for 90 days
+            this.cookieService.set('password', password, 90);  // Save password for 90 days
+            this.cookieService.set('rememberMe', 'true', 90);  // Save "remember me" flag
+          } else {
+            // Clear cookies if "Remember Me" is not selected
+            this.cookieService.delete('email');
+            this.cookieService.delete('password');
+            this.cookieService.delete('rememberMe');
+          }
+  
+          // Update authentication state
+          this.isLoggedInSubject.next(true);
+          this.userService.setCurrentUser(user);
+  
+          // Notify the user and navigate to dashboard
+          alert('Logged in successfully');
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Login error:', err);  // Log the error for debugging
+          alert('Invalid credentials. Please try again.');
+        },
+        complete: () => {
+          console.log('Login request completed.');
         }
-
-        // Update the authentication state and navigate
-        this.isLoggedInSubject.next(true);
-        this.userService.setCurrentUser(user);
-        alert('Logged in successfully');
-        this.router.navigate(['/dashboard']);
-      }, error => {
-        alert('Invalid credentials');
       });
   }
+  
 
   logout() {
     // clear local storage
