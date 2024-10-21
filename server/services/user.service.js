@@ -55,6 +55,7 @@ export const getAllUsersService = async ({
       },
       order: [[sortBy, order]], // sort by the specified field and order
       ...pagination({ page, limit }), // use pagination function to limit results
+      logging: console.log,
     });
 
     return users;

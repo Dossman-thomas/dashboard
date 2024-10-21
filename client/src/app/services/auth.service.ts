@@ -37,7 +37,10 @@ export class AuthService {
 
   // Updated login method to handle JWT token
   login(email: string, password: string, rememberMe: boolean) {
-    this.http.post<any>('http://localhost:5000/api/auth/login', { email, password })
+    const loginData = { email, password };
+    const headers = { 'Content-Type': 'application/json' };
+
+    this.http.post<any>('http://localhost:5000/api/auth/login', loginData, { headers })
       .subscribe(response => {
         const { token, user } = response.data;
 
@@ -66,9 +69,14 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');  // Clear token
+    // clear local storage
+    localStorage.removeItem('token'); 
     localStorage.removeItem('currentUser');
+
+    // update authentication state
     this.isLoggedInSubject.next(false);
+
+    // navigate to login page after logout
     this.router.navigate(['/login']);
   }
 
