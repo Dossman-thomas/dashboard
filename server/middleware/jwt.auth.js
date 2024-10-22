@@ -31,8 +31,8 @@ export const authenticateJWT = (req, res, next) => {
             console.error("JWT Verification Error:", err); // Log the error for debugging
             // Return 403 if the token is invalid or expired
             return response(res, {
-                statusCode: 403,
-                message: messages.general.UNAUTHORIZED, // 403 Forbidden for invalid/expired token
+                statusCode: 401,
+                message: messages.general.UNAUTHORIZED, // 401 Unauthorized for invalid/expired token
             });
         }
 
