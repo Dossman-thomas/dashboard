@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { UserService } from './user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClient } from '@angular/common/http'; 
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
@@ -24,14 +25,45 @@ export class AuthService {
 
   private checkInitialAuthState() {
     const token = localStorage.getItem('token');
-    this.isLoggedInSubject.next(!!token);
+    this.isLoggedInSubject.next(!!token); // Update the subject with the initial value
   }
 
   private handlePopStateEvent() {
     const token = localStorage.getItem('token');
     if (!token) {
-      this.isLoggedInSubject.next(false); 
+      this.isLoggedInSubject.next(false);  // Update the subject if the token is missing
       this.router.navigate(['/login']);
+    }
+  }
+
+  // Helper function to check if token is valid or expired
+  checkTokenStatus(): boolean {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      // No token present, redirect to login page
+      this.router.navigate(['/login']);
+      return false;
+    }
+
+    try {
+      const decodedToken: any = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+
+      if (decodedToken.exp < currentTime) {
+        // Token has expired
+        localStorage.removeItem('token'); // Optionally remove the expired token
+        localStorage.removeItem('currentUser');
+        this.isLoggedInSubject.next(false); // Update authentication state
+        this.router.navigate(['/login']);  // Redirect to login
+        return false;
+      }
+
+      return true;  // Token is valid
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      this.router.navigate(['/login']);
+      return false;
     }
   }
 
