@@ -37,35 +37,43 @@ export class AuthService {
   }
 
   // Helper function to check if token is valid or expired
-  checkTokenStatus(): boolean {
-    const token = localStorage.getItem('token');
+checkTokenStatus(): boolean {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      // No token present, redirect to login page
-      this.router.navigate(['/login']);
-      return false;
-    }
-
-    try {
-      const decodedToken: any = jwtDecode(token);
-      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-
-      if (decodedToken.exp < currentTime) {
-        // Token has expired
-        localStorage.removeItem('token'); // Optionally remove the expired token
-        localStorage.removeItem('currentUser');
-        this.isLoggedInSubject.next(false); // Update authentication state
-        this.router.navigate(['/login']);  // Redirect to login
-        return false;
-      }
-
-      return true;  // Token is valid
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      this.router.navigate(['/login']);
-      return false;
-    }
+  if (!token) {
+    // No token present, treat as 401 Unauthorized
+    this.handleUnauthorizedAccess(); // Handle unauthorized access
+    return false;
   }
+
+  try {
+    const decodedToken: any = jwtDecode(token);
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+
+    if (decodedToken.exp < currentTime) {
+      // Token has expired, treat as 401 Unauthorized
+      localStorage.removeItem('token'); // Optionally remove the expired token
+      localStorage.removeItem('currentUser');
+      this.isLoggedInSubject.next(false); // Update authentication state
+      this.handleUnauthorizedAccess(); // Handle unauthorized access
+      return false;
+    }
+
+    return true;  // Token is valid
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    this.handleUnauthorizedAccess(); // Handle unauthorized access
+    return false;
+  }
+}
+
+// Private method to handle unauthorized access
+private handleUnauthorizedAccess(): void {
+  // Optionally show a 401 Unauthorized message or redirect
+  alert('Unauthorized access. Please log in again.'); // Display a message to the user
+  this.router.navigate(['/login']); // Redirect to login page
+}
+
 
   // Updated login method to handle JWT token
   login(email: string, password: string, rememberMe: boolean): void {
