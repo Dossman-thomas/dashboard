@@ -20,7 +20,9 @@ export class AuthGuard implements CanActivate {
   ): boolean | UrlTree | Observable<boolean | UrlTree> {
     let currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+      return this.router.createUrlTree(['/login'], {
+        queryParams: { returnUrl: state.url },
+      });
     }
     return true; // User is authenticated
   }
