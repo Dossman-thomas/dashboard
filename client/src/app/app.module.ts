@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './auth/auth.interceptor';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -32,7 +34,7 @@ import { UpdateButtonRendererComponent } from './update-button-renderer/update-b
     DeleteRecordComponent,
     MyAccountComponent,
     DeleteButtonRendererComponent,
-    UpdateButtonRendererComponent
+    UpdateButtonRendererComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,7 +44,9 @@ import { UpdateButtonRendererComponent } from './update-button-renderer/update-b
     ReactiveFormsModule,
     HttpClientModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

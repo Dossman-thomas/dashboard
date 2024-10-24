@@ -4,7 +4,6 @@ import { BehaviorSubject } from 'rxjs';
 import { UserService } from './user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClient } from '@angular/common/http';
-import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
