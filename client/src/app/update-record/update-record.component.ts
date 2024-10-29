@@ -41,57 +41,49 @@ export class UpdateRecordComponent implements OnInit {
     this.fetchUsers();
   }
 
-  fetchUsers() {
+  // fetchUsers() {
+  //   this.userService.getAllUsers().subscribe({
+  //     next: (users) => {
+  //       this.users = users;
+  //       if (this.gridApi) {
+  //         this.gridApi.updateGridOptions({
+  //           rowData: this.users,
+  //         });
+  //       }
+  //       console.log('Users:', this.users);
+  //     },
+  //     error: (error) => {
+  //       console.error('Error fetching users:', error);
+  //     },
+  //   });
+  // }
+
+  fetchUsers(): void {
     this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.users = users;
-        if (this.gridApi) {
-          // Use setRowData instead of setGridOption
-          this.gridApi.updateGridOptions({
-            rowData: this.users,
-          });
+      next: (response: any) => {
+        // Check if response.rows exists and is an array
+        if (Array.isArray(response.rows)) {
+          this.users = response.rows as User[];
+          if (this.gridApi) {
+            this.gridApi.applyTransaction({ add: this.users }); // Apply the data transaction
+          }
+          console.log('Users:', this.users);
+        } else {
+          console.error('Expected rows array but got:', response);
         }
-        console.log('Users:', this.users);
       },
       error: (error) => {
         console.error('Error fetching users:', error);
-      },
+      }
     });
   }
+  
+  
 
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.fetchUsers(); // Fetch users when the grid is ready
   }
-
-  // openModal(user: User): void {
-  //   this.selectedUser = { ...user };
-  //   const modalElement = document.getElementById('updateModal');
-  //   if (modalElement) {
-  //     const modal = new bootstrap.Modal(modalElement);
-  //     modal.show();
-  //   }
-  // }
-
-  // onUpdateUser(): void {
-  //   if (this.selectedUser && this.selectedUser.id) {
-  //     this.userService.updateUser(this.selectedUser).subscribe({
-  //       next: () => {
-  //         const modalElement = document.getElementById('updateModal');
-  //         if (modalElement) {
-  //           const modal = bootstrap.Modal.getInstance(modalElement);
-  //           if (modal) {
-  //             modal.hide();
-  //           }
-  //         }
-  //         this.fetchUsers(); // Fetch updated user list
-  //       },
-  //       error: (error) => {
-  //         console.error('Error updating user:', error);
-  //       }
-  //     });
-  //   }
-  // }
 
   onCellValueChanged(event: any): void {
     const updatedUser: User = event.data as User;
