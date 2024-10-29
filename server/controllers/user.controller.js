@@ -139,14 +139,14 @@ export const getAllUsers = async (req, res) => {
     const { 
       page, 
       limit, 
-      search = "", 
+      searchQuery = "", 
       sortBy = "createdAt", 
       order = 'DESC',
     } = req.query;
     const users = await getAllUsersService({
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      searchQuery: search,
+      searchQuery,
       sortBy,
       order,
     });
