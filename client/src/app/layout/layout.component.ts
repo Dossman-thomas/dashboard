@@ -6,7 +6,7 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css']
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent {
   isLoggedIn: boolean = false; 
 
   constructor(private authService: AuthService) {}

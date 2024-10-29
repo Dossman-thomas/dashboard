@@ -6,14 +6,6 @@ import { AuthService } from './services/auth.service' // Update with the correct
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  isLoggedIn: boolean = false;
+export class AppComponent {
 
-  constructor(private authService: AuthService) {}
-
-  ngOnInit() {
-    this.authService.isLoggedIn$.subscribe(isLoggedIn => {
-      this.isLoggedIn = isLoggedIn;
-    });
-  }
 }
