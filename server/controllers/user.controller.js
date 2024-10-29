@@ -137,8 +137,8 @@ export const getUserById = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const { 
-      page, 
-      limit, 
+      page = 1, 
+      limit = 10, 
       searchQuery = "", 
       sortBy = "createdAt", 
       order = 'DESC',
