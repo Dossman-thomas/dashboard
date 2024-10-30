@@ -29,8 +29,5 @@ userRouter.delete('/delete/:id', authenticateJWT, deleteUser); // endpoint: /api
 // Fetch current User
 userRouter.get('/current-user/:id', authenticateJWT, getCurrentUser); // endpoint: /api/users/current-user/:id
 
-// // Login user route
-// userRouter.post('/login', loginUser); // endpoint: /api/users/login
-
 // // Verify user password route
 // userRouter.post('/:id/verify-password', verifyUserPassword); // endpoint: /api/users/:id/verify-password

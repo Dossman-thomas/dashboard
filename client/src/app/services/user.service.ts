@@ -37,26 +37,39 @@ export class UserService {
   // Define currentUser$ as an Observable for the current user
   public currentUser$: Observable<User | null>;
 
+
   constructor(private http: HttpClient) {
-    const currentUser = localStorage.getItem('currentUser');
-    this.currentUserSubject = new BehaviorSubject<User | null>(
-      currentUser ? JSON.parse(currentUser) : null
-    );
+    this.currentUserSubject = new BehaviorSubject<User | null>(null);
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
+
+    // Method to get the current user from the server using the user's ID
+    fetchCurrentUser(id: number): Observable<User> {
+      return this.http
+        .get<User>(`${this.baseUrl}/current-user/${id}`, { headers: this.getHeaders() }) // Adjusted endpoint
+        .pipe(
+          map((user) => {
+            this.setCurrentUser(user); // Set the current user
+            return user;
+          }),
+          catchError((error) => {
+            console.error('Error fetching current user:', error);
+            return throwError(() => new Error('Failed to fetch current user. Please try again later.'));
+          })
+        );
+    }
 
   // Method to get the current user
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
-  // Set the current user and update localStorage
+  clearCurrentUser(): void {
+    return this.currentUserSubject.next(null);
+  };
+
+  // Set the current user in BehaviorSubject
   setCurrentUser(user: User | null): void {
-    if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('currentUser');
-    }
     this.currentUserSubject.next(user);
   }
 
@@ -152,21 +165,21 @@ export class UserService {
   }
 
   // Verify user password (if you choose to implement it)
-  verifyPassword(
-    id: number,
-    passwordData: { password: string }
-  ): Observable<boolean> {
-    return this.http.post<boolean>(
-      `${this.baseUrl}/${id}/verify-password`,
-      passwordData
-    );
-  }
+  // verifyPassword(
+  //   id: number,
+  //   passwordData: { password: string }
+  // ): Observable<boolean> {
+  //   return this.http.post<boolean>(
+  //     `${this.baseUrl}/${id}/verify-password`,
+  //     passwordData
+  //   );
+  // }
 
   // Logout and clear the user from localStorage
-  logout(): void {
-    localStorage.removeItem('currentUser');
-    this.setCurrentUser(null); // Clears the current user in the BehaviorSubject
-  }
+  // logout(): void {
+  //   localStorage.removeItem('currentUser');
+  //   this.setCurrentUser(null); // Clears the current user in the BehaviorSubject
+  // }
 
   // Error handling method
   private handleError<T>(operation = 'operation', result?: T) {

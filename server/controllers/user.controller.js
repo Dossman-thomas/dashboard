@@ -8,32 +8,7 @@ import {
   deleteUserService,
   authenticateUserService,
 } from "../services/index.js";
-// import jwt from "jsonwebtoken";
 
-// const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret"; 
-
-// Login user
-// export const loginUser = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const user = await authenticateUserService(email, password);
-
-
-//     console.log(user.id); 
-
-//     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-//       expiresIn: "1h", // token expires in 1 hour
-//     });
-
-
-//   } catch (error) {
-//     console.error(error);
-//     return response(res, {
-//       statusCode: 500,
-//       message: messages.general.INTERNAL_SERVER_ERROR,
-//     });
-//   }
-// };
 
 export const getCurrentUser = async (req, res) => {
   try {

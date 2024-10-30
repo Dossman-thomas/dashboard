@@ -8,7 +8,7 @@ import { UserService, User } from '../services/user.service';
   styleUrls: ['./my-account.component.css'],
 })
 export class MyAccountComponent implements OnInit {
-  
+
   currentUser: User | null = null;
   isEditing = false;
   isChangingPassword = false;
@@ -72,13 +72,12 @@ export class MyAccountComponent implements OnInit {
         name: this.userForm.value.name,
         email: this.userForm.value.email,
       };
-  
-      // Ensure currentUser.id is defined and is a number
+
       if (this.currentUser.id !== undefined) {
-        // Call updateUser with both id and updatedUser
         this.userService.updateUser(this.currentUser.id, updatedUser).subscribe({
           next: (user) => {
             console.log('User updated:', user);
+            this.userService.setCurrentUser(user); // Update the current user in UserService
             alert('Your profile was updated successfully.');
             this.isEditing = false;
           },
@@ -129,6 +128,7 @@ export class MyAccountComponent implements OnInit {
       this.userService.updateUser(this.currentUser.id, updatedUser).subscribe({
         next: () => {
           console.log('Password updated successfully.');
+          this.userService.setCurrentUser(updatedUser); // Update the current user in UserService
           this.onCancelPasswordChange();
           alert('Your password was updated successfully.');
         },

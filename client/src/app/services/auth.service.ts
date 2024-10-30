@@ -48,7 +48,7 @@ export class AuthService {
 
           // Store the token and user in localStorage
           localStorage.setItem('token', token);
-          localStorage.setItem('currentUser', JSON.stringify(user));
+          // localStorage.setItem('currentUser', JSON.stringify(user));
 
           // Handle "Remember Me" functionality
           if (rememberMe) {
@@ -65,6 +65,7 @@ export class AuthService {
           // Update authentication state
           this.isLoggedInSubject.next(true);
           this.userService.setCurrentUser(user);
+          console.log('Logged in user:', user.id, user.name, user.role);
 
           // Notify the user and navigate to dashboard
           alert('Logged in successfully');
@@ -83,7 +84,7 @@ export class AuthService {
   logout() {
     // clear local storage
     localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
+    this.userService.clearCurrentUser();
 
     // update authentication state
     this.isLoggedInSubject.next(false);
