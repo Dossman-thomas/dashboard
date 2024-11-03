@@ -39,25 +39,29 @@ export class UserService {
 
 
   constructor(private http: HttpClient) {
-    this.currentUserSubject = new BehaviorSubject<User | null>(null);
+    // Initialize the current user from localStorage, if available
+    const storedUser = localStorage.getItem('currentUser');
+    const initialUser = storedUser ? JSON.parse(storedUser) : null;
+
+    this.currentUserSubject = new BehaviorSubject<User | null>(initialUser);
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
     // Method to get the current user from the server using the user's ID
-    fetchCurrentUser(id: number): Observable<User> {
-      return this.http
-        .get<User>(`${this.baseUrl}/current-user/${id}`, { headers: this.getHeaders() }) // Adjusted endpoint
-        .pipe(
-          map((user) => {
-            this.setCurrentUser(user); // Set the current user
-            return user;
-          }),
-          catchError((error) => {
-            console.error('Error fetching current user:', error);
-            return throwError(() => new Error('Failed to fetch current user. Please try again later.'));
-          })
-        );
-    }
+    // fetchCurrentUser(id: number): Observable<User> {
+    //   return this.http
+    //     .get<User>(`${this.baseUrl}/current-user/${id}`, { headers: this.getHeaders() }) // Adjusted endpoint
+    //     .pipe(
+    //       map((user) => {
+    //         this.setCurrentUser(user); // Set the current user
+    //         return user;
+    //       }),
+    //       catchError((error) => {
+    //         console.error('Error fetching current user:', error);
+    //         return throwError(() => new Error('Failed to fetch current user. Please try again later.'));
+    //       })
+    //     );
+    // }
 
   // Method to get the current user
   getCurrentUser(): User | null {
@@ -68,9 +72,14 @@ export class UserService {
     return this.currentUserSubject.next(null);
   };
 
-  // Set the current user in BehaviorSubject
+  // Set the current user and save it to localStorage
   setCurrentUser(user: User | null): void {
     this.currentUserSubject.next(user);
+    if (user) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('currentUser');
+    }
   }
 
   // Get the current user value
@@ -128,21 +137,46 @@ export class UserService {
   }
 
   // Update a user by ID
-  updateUser(id: number, userData: User): Observable<User> {
-    return this.http
-      .put<User>(`${this.baseUrl}/update/${id}`, userData, {
-        headers: this.getHeaders(),
+  // updateUser(id: number, userData: User): Observable<User> {
+  //   return this.http
+  //     .put<User>(`${this.baseUrl}/update/${id}`, userData, {
+  //       headers: this.getHeaders(),
+  //     })
+  //     .pipe(
+  //       // No need for map if the API returns the updated user directly
+  //       catchError((error) => {
+  //         console.error('Error updating user:', error);
+  //         return throwError(
+  //           () => new Error('Failed to update user. Please try again later.')
+  //         );
+  //       })
+  //     );
+  // }
+
+// Update user information and reset the current user in localStorage
+updateUser(id: number, userData: User): Observable<User> {
+  return this.http
+    .put<{ status: number; message: string; data: User }>(`${this.baseUrl}/update/${id}`, userData, { headers: this.getHeaders() })
+    .pipe(
+      map((response) => {
+        const updatedUser = response.data;
+        
+        // If the updated user is the current user, update the stored current user
+        const currentUser = this.getCurrentUser();
+        if (currentUser && currentUser.id === updatedUser.id) {
+          this.setCurrentUser(updatedUser);
+          console.log('Current user updated:', updatedUser);
+        }
+
+        return updatedUser; // Return only the updated user object
+      }),
+      catchError((error) => {
+        console.error('Error updating user:', error);
+        return throwError(() => new Error('Failed to update user. Please try again later.'));
       })
-      .pipe(
-        // No need for map if the API returns the updated user directly
-        catchError((error) => {
-          console.error('Error updating user:', error);
-          return throwError(
-            () => new Error('Failed to update user. Please try again later.')
-          );
-        })
-      );
-  }
+    );
+}
+
 
   // Delete a user by ID
   deleteUser(id: number): Observable<any> {

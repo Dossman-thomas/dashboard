@@ -39,12 +39,8 @@ export class MyAccountComponent implements OnInit {
       confirmNewPassword: ['', Validators.required],
     });
   }
-
   ngOnInit(): void {
-    this.loadCurrentUser();
-  }
-
-  loadCurrentUser(): void {
+    // Subscribe to changes in currentUser$ to keep currentUser updated in real time
     this.userService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       if (user) {
@@ -54,6 +50,17 @@ export class MyAccountComponent implements OnInit {
         });
       }
     });
+  }
+
+  loadCurrentUser(): void {
+    const user = this.userService.getCurrentUser();
+    this.currentUser = user;
+    if (user) {
+      this.userForm.patchValue({
+        name: user.name,
+        email: user.email,
+      });
+    }
   }
 
   onEdit(): void {
@@ -102,26 +109,23 @@ export class MyAccountComponent implements OnInit {
   }
 
   onSubmitNewPassword(): void {
-    if (!this.currentUser) return; // if currentUser is null, exit early
+    if (!this.currentUser) return;
 
     const { currentPassword, newPassword, confirmNewPassword } = this.passwordForm.value;
 
-    // Validate current password
     if (this.currentUser.password !== currentPassword) {
       this.passwordError = 'Current password is incorrect.';
       return;
     }
 
-    // Validate new password match
     if (newPassword !== confirmNewPassword) {
       this.passwordError = 'New passwords do not match.';
       return;
     }
 
-    // Update password
     const updatedUser: User = {
       ...this.currentUser,
-      password: newPassword, // Update the password
+      password: newPassword,
     };
 
     if (this.currentUser.id) {
@@ -143,7 +147,7 @@ export class MyAccountComponent implements OnInit {
   }
 
   togglePasswordVisibility() {
-    this.showPassword = !this.showPassword; // Toggles the value of showPassword
+    this.showPassword = !this.showPassword;
   }
 
   toggleNewPasswordVisibility() {
