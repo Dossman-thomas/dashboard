@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
+import { tap, take } from 'rxjs/operators';
 import { PermissionsService, RolePermissions } from '../services/permissions.service';
 
 @Component({
@@ -8,29 +9,44 @@ import { PermissionsService, RolePermissions } from '../services/permissions.ser
   styleUrls: ['./manage-permissions.component.css']
 })
 export class ManagePermissionsComponent implements OnInit {
-  rolePermissions$: Observable<RolePermissions[]> = of([]); // Initialize with an empty observable
+  rolePermissions$: Observable<RolePermissions[]>; // Observable for permissions data
+  rolePermissions: RolePermissions[] = []; // Local copy to easily modify permissions
 
-  constructor(private permissionsService: PermissionsService) {}
+  constructor(private permissionsService: PermissionsService) {
+    this.rolePermissions$ = this.permissionsService.getPermissions$().pipe(
+      tap(permissions => (this.rolePermissions = permissions)) // Store permissions locally
+    );
+  }
 
   ngOnInit(): void {
-    // Load role permissions from the service
-    this.rolePermissions$ = this.permissionsService.getPermissions$();
+    this.permissionsService.rolePermissions$.subscribe(permissions => {
+      this.rolePermissions = permissions; // Update local permissions variable
+      console.log('Current permissions:', this.rolePermissions); // Debugging log
+    });
   }
 
   onPermissionChange(role: string, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    this.rolePermissions$.subscribe(rolePermissions => {
-      const updatedRole = rolePermissions.find(rp => rp.role === role);
-      if (updatedRole) {
-        const updatedPermissions = {
-          ...updatedRole,
-          [checkbox.name]: checkbox.checked
-        };
 
-        this.permissionsService.updatePermissions(role, updatedPermissions).subscribe(() => {
+    // Find the role to update and toggle the permission based on the checkbox
+    const updatedRole = this.rolePermissions.find(rp => rp.role === role);
+    if (updatedRole) {
+      const updatedPermissions = {
+        ...updatedRole,
+        [checkbox.name]: checkbox.checked,
+      };
+
+      // Call update method in the service to sync with backend
+      this.permissionsService.updatePermissions(role, updatedPermissions)
+        .pipe(take(1)) // Complete the subscription after one response
+        .subscribe(() => {
           console.log(`${role} permissions updated successfully`);
+
+          // Update the local rolePermissions to reflect changes immediately
+          this.rolePermissions = this.rolePermissions.map(rp =>
+            rp.role === role ? updatedPermissions : rp
+          );
         });
-      }
-    });
+    }
   }
 }

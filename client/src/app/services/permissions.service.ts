@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, tap, map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
+// Interface to define role permissions
 export interface RolePermissions {
   role: string;
   canCreate: boolean;
@@ -9,67 +12,78 @@ export interface RolePermissions {
   canDelete: boolean;
 }
 
+// Interface for the API response
+export interface ApiResponse<T> {
+  status: number;
+  message: string;
+  data: T;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class PermissionsService {
-  private rolesPermissionsSubject = new BehaviorSubject<RolePermissions[]>([
-    {
-      role: 'admin',
-      canCreate: true,
-      canRead: true,
-      canUpdate: true,
-      canDelete: true,
-    },
-    {
-      role: 'data manager',
-      canCreate: true,
-      canRead: true,
-      canUpdate: true,
-      canDelete: false,
-    },
-    {
-      role: 'employee',
-      canCreate: false,
-      canRead: true,
-      canUpdate: false,
-      canDelete: false,
-    },
-  ]);
-
-  // Observable to emit role permissions
+  private rolesPermissionsSubject = new BehaviorSubject<RolePermissions[]>([]);
   rolePermissions$ = this.rolesPermissionsSubject.asObservable();
+  private apiUrl = 'http://localhost:5000/api/permissions'; // Base URL for permissions API
 
-  constructor() {
-    // Optionally load initial data if needed
+  constructor(private http: HttpClient) {
+    // Load initial permissions data from the backend
+    this.loadPermissions();
   }
 
-  // Retrieve all role permissions as an observable
+  // getPermissions$ method to return the observable
   getPermissions$(): Observable<RolePermissions[]> {
     return this.rolePermissions$;
   }
 
-  // Get permissions for a specific role
-  getPermissionsForRole(role: string): Observable<RolePermissions | undefined> {
-    const permissions = this.rolesPermissionsSubject.getValue().find(rp => rp.role === role);
-    return of(permissions);
+  // Fetch all role permissions from the backend and emit them
+  private loadPermissions(): void {
+    this.http.get<ApiResponse<RolePermissions[]>>(this.apiUrl)
+      .pipe(
+        catchError(this.handleError),
+        tap(response => {
+          console.log('Loaded permissions:', response); // Log the full response for debugging
+          this.rolesPermissionsSubject.next(response.data); // Emit the data array
+        })
+      )
+      .subscribe();
   }
 
-  // Update permissions for a specific role
-  updatePermissions(role: string, permissions: Partial<RolePermissions>): Observable<void> {
-    const rolePermissions = this.rolesPermissionsSubject.getValue();
-    const roleIndex = rolePermissions.findIndex(rp => rp.role === role);
+  // Get permissions for a specific role from the backend
+  getPermissionsForRole(role: string): Observable<RolePermissions | undefined> {
+    return this.http.get<ApiResponse<RolePermissions>>(`${this.apiUrl}/role/${role}`).pipe(
+      map(response => response.data), // Extract data property
+      catchError(this.handleError)
+    );
+  }
 
-    if (roleIndex !== -1) {
-      const updatedPermissions = { ...rolePermissions[roleIndex], ...permissions };
-      
-      // Check if there are actual changes before updating
-      if (JSON.stringify(rolePermissions[roleIndex]) !== JSON.stringify(updatedPermissions)) {
-        rolePermissions[roleIndex] = updatedPermissions;
-        this.rolesPermissionsSubject.next(rolePermissions); // Emit updated permissions
-      }
+  // Update permissions for a specific role on the backend
+  updatePermissions(role: string, updatedPermissions: Partial<RolePermissions>): Observable<RolePermissions> {
+    return this.http.put<ApiResponse<RolePermissions>>(`${this.apiUrl}/role/${role}`, updatedPermissions).pipe(
+      map(response => response.data), // Extract data property
+      tap((permissions) => {
+        console.log('Updated permissions:', permissions); // Log updated permissions
+        // Update local cache after successful update
+        const currentPermissions = this.rolesPermissionsSubject.getValue();
+        const updatedList = currentPermissions.map(rp => rp.role === role ? permissions : rp);
+        this.rolesPermissionsSubject.next(updatedList); // Emit the updated list
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  // Handle HTTP errors
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'An error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Client error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Server error: ${error.status}, message: ${error.message}`;
     }
-
-    return of(undefined);
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }
