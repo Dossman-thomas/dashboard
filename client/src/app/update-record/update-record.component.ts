@@ -41,22 +41,6 @@ export class UpdateRecordComponent implements OnInit {
     this.fetchUsers();
   }
 
-  // fetchUsers() {
-  //   this.userService.getAllUsers().subscribe({
-  //     next: (users) => {
-  //       this.users = users;
-  //       if (this.gridApi) {
-  //         this.gridApi.updateGridOptions({
-  //           rowData: this.users,
-  //         });
-  //       }
-  //       console.log('Users:', this.users);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching users:', error);
-  //     },
-  //   });
-  // }
 
   fetchUsers(): void {
     this.userService.getAllUsers().subscribe({

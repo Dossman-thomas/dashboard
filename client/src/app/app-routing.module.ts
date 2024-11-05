@@ -11,6 +11,7 @@ import { CreateRecordComponent } from './create-record/create-record.component';
 import { UpdateRecordComponent } from './update-record/update-record.component';
 import { DeleteRecordComponent } from './delete-record/delete-record.component';
 import { MyAccountComponent } from './my-account/my-account.component';
+import { ManageRecordsComponent } from './manage-records/manage-records.component';
 
 // Define routes
 const routes: Routes = [
@@ -28,6 +29,11 @@ const routes: Routes = [
       {
         path: 'manage-permissions',
         component: ManagePermissionsComponent,
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'manage-records',
+        component: ManageRecordsComponent,
         canActivate: [AuthGuard],
       },
       {

@@ -60,15 +60,7 @@ export class CreateRecordComponent implements OnInit {
   redirectToDash(): void {
     this.router.navigate(['/dashboard']);
   }
-
-  // private generateNewId(): void {
-  //   this.userService.getCurrentUsers().subscribe(users => {
-  //     const newId = Math.max(...users.map(user => user.id)) + 1;
-  //     this.createUserForm.patchValue({ id: newId });
-  //   });
-  // }
   
-
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }

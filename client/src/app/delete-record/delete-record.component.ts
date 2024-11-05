@@ -31,7 +31,7 @@ export class DeleteRecordComponent implements OnInit {
     { field: 'role', headerName: 'Role', flex: 2 },
     {
       headerName: 'Delete Record',
-      cellRenderer: DeleteButtonRendererComponent,
+      cellRenderer: DeleteButtonRendererComponent, // Custom cell renderer for delete button
       cellRendererParams: {
         onClick: this.onDelete.bind(this),
       },
