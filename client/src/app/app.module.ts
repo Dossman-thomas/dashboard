@@ -21,6 +21,7 @@ import { MyAccountComponent } from './my-account/my-account.component';
 import { DeleteButtonRendererComponent } from './delete-button-renderer/delete-button-renderer.component';
 import { UpdateButtonRendererComponent } from './update-button-renderer/update-button-renderer.component';
 import { LayoutComponent } from './layout/layout.component';
+import { ManageRecordsComponent } from './manage-records/manage-records.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { LayoutComponent } from './layout/layout.component';
     DeleteButtonRendererComponent,
     UpdateButtonRendererComponent,
     LayoutComponent,
+    ManageRecordsComponent,
   ],
   imports: [
     BrowserModule,
