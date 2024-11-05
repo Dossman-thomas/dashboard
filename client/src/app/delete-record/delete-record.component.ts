@@ -72,6 +72,4 @@ export class DeleteRecordComponent implements OnInit {
       });
     }
   }
-  
-
 }
