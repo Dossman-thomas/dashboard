@@ -20,7 +20,7 @@
     <li *ngIf="hasManageRecordsPermission">
       <button (click)="toggleManageRecordsDropdown()" class="d-flex gap-2 mb-2">
         <i class="fa fa-database"></i>
-        <span *ngIf="!isCollapsed">Manage Records</span>
+        <span *ngIf="!isCollapsed" routerLink="/manage-records">Manage Records</span>
         <i class="fa" [ngClass]="showManageRecordsDropdown ? 'fa-chevron-down' : 'fa-chevron-right'" *ngIf="!isCollapsed"></i>
       </button>
       <ul *ngIf="showManageRecordsDropdown && !isCollapsed">
