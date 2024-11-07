@@ -12,7 +12,7 @@
     margin-bottom: 8px;
 }
 
-.change-password-btn {
+/* .change-password-btn {
     color: var(--secondary-red);
     cursor: pointer;
 }
@@ -41,7 +41,7 @@
     color: white;
     cursor: pointer;
 
-}
+} */
 
 #update-heading,
 #change-pass-heading {
