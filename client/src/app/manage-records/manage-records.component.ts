@@ -53,7 +53,7 @@ export class ManageRecordsComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.fetchUsers();
+    // this.fetchUsers();
     this.initializeForm();
   }
 

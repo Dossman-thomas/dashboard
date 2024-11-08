@@ -17,7 +17,14 @@
       </button>
     </li>
 
-    <li *ngIf="hasManageRecordsPermission">
+    <li>
+      <button routerLink="/manage-records" routerLinkActive="active">
+        <i class="fa fa-database"></i>
+        <span *ngIf="!isCollapsed">Manage Records</span>
+      </button>
+    </li>
+
+    <!-- <li *ngIf="hasManageRecordsPermission">
       <button (click)="toggleManageRecordsDropdown()" class="d-flex gap-2 mb-2">
         <i class="fa fa-database"></i>
         <span *ngIf="!isCollapsed" routerLink="/manage-records">Manage Records</span>
@@ -34,7 +41,7 @@
           <button routerLink="/delete-record" routerLinkActive="active">Delete Record</button>
         </li>
       </ul>
-    </li>
+    </li> -->
 
     <li>
       <button routerLink="/my-account" routerLinkActive="active">
