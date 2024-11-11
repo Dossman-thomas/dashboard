@@ -43,7 +43,7 @@ export class PermissionsService {
       .pipe(
         catchError(this.handleError),
         tap(response => {
-          console.log('Loaded permissions:', response); // Log the full response for debugging
+          // console.log('Loaded permissions:', response); // Log the full response for debugging
           this.rolesPermissionsSubject.next(response.data); // Emit the data array
         })
       )
@@ -52,11 +52,20 @@ export class PermissionsService {
 
   // Get permissions for a specific role from the backend
   getPermissionsForRole(role: string): Observable<RolePermissions | undefined> {
+    // console.log(`Fetching permissions for role: ${role}`);
+  
     return this.http.get<ApiResponse<RolePermissions>>(`${this.apiUrl}/role/${role}`).pipe(
-      map(response => response.data), // Extract data property
-      catchError(this.handleError)
+      map(response => {
+        // console.log(`Received response for role '${role}':`, response);
+        return response.data; // Extract the data property
+      }),
+      catchError(error => {
+        console.error(`Error fetching permissions for role '${role}':`, error);
+        return this.handleError(error);
+      })
     );
   }
+  
 
   // Update permissions for a specific role on the backend
   updatePermissions(role: string, updatedPermissions: Partial<RolePermissions>): Observable<RolePermissions> {

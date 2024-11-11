@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserService, User } from '../services/user.service';
+import { PermissionsService } from '../services/permissions.service';
 import { ColDef, GridApi } from 'ag-grid-community';
 import { DeleteButtonRendererComponent } from '../delete-button-renderer/delete-button-renderer.component';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -21,7 +22,16 @@ export class ManageRecordsComponent implements OnInit {
   roles: string[] = ['admin', 'data manager', 'employee'];
   showPassword: boolean = false;
 
-  constructor(private userService: UserService, private fb: FormBuilder) {}
+  // Permissions flags
+  canCreate: boolean = false;
+  canUpdate: boolean = false;
+  // canDelete: boolean = false;
+
+  constructor(
+    private userService: UserService,
+    private fb: FormBuilder,
+    private permissionsService: PermissionsService
+  ) {}
 
   paginationPageSizeSelector = [10, 25, 50, 100];
   paginationPageSize = 25;
@@ -31,7 +41,7 @@ export class ManageRecordsComponent implements OnInit {
     flex: 1,
     filter: true,
     sortable: true,
-    editable: true,
+    editable: (params) => this.canUpdate, // Enable editing based on permissions
   };
 
   colDefs: ColDef[] = [
@@ -40,10 +50,11 @@ export class ManageRecordsComponent implements OnInit {
     { field: 'email', headerName: 'Email', flex: 3 },
     { field: 'role', headerName: 'Role', flex: 2 },
     {
-      headerName: 'Delete',
+      headerName: 'Action',
       cellRenderer: DeleteButtonRendererComponent, // Custom cell renderer for delete button
       cellRendererParams: {
-        onClick: this.onDelete.bind(this), // Bind the onDelete method to the cell renderer
+        onClick: this.onDelete.bind(this),
+        // canDelete: this.canDelete // Pass the permission flag to the renderer
       },
       editable: false,
       filter: false,
@@ -53,9 +64,42 @@ export class ManageRecordsComponent implements OnInit {
   ];
 
   ngOnInit() {
-    // this.fetchUsers();
     this.initializeForm();
+    this.setPermissions();
   }
+
+  // Fetch current user's permissions
+  setPermissions(): void {
+    // console.log('Fetching current user for permissions...');
+    
+    const currentUser = this.userService.getCurrentUser();
+    if (currentUser) {
+      console.log(`Current user role: ${currentUser.role}`);
+      
+      this.permissionsService.getPermissionsForRole(currentUser.role).subscribe({
+        next: (permissions) => {
+          if (permissions) {
+            this.canCreate = permissions.canCreate;
+            this.canUpdate = permissions.canUpdate;
+            // this.canDelete = permissions.canDelete;
+            
+            // console.log(`Permissions for role '${currentUser.role}':`);
+            console.log(`- Can create: ${this.canCreate}`);
+            console.log(`- Can update: ${this.canUpdate}`);
+            // console.log(`- Can delete: ${this.canDelete}`);
+          } else {
+            console.warn(`No permissions found for role: ${currentUser.role}`);
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching permissions:', error);
+        },
+      });
+    } else {
+      console.warn('No current user found. Unable to set permissions.');
+    }
+  }
+  
 
   // Initialize the create user form
   initializeForm() {
@@ -85,7 +129,7 @@ export class ManageRecordsComponent implements OnInit {
           if (this.gridApi) {
             this.gridApi.applyTransaction({ add: this.users }); // Apply the data transaction
           }
-          console.log('Users:', this.users);
+          // console.log('Users:', this.users);
         } else {
           console.error('Expected rows array but got:', response);
         }
@@ -98,11 +142,16 @@ export class ManageRecordsComponent implements OnInit {
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-    console.log('Grid API initialized:', this.gridApi);
+    // console.log('Grid API initialized:', this.gridApi);
     this.fetchUsers();
   }
 
   onCellValueChanged(event: any): void {
+    if (!this.canUpdate) {
+      console.error('You do not have permission to update this record.');
+      return;
+    }
+
     const updatedUser: User = event.data;
     if (updatedUser.id) {
       this.userService.updateUser(updatedUser.id, updatedUser).subscribe({
@@ -115,6 +164,11 @@ export class ManageRecordsComponent implements OnInit {
   }
 
   onDelete(userId: number): void {
+    // if (!this.canDelete) {
+    //   alert("You don't have permission to delete this record.");
+    //   return;
+    // }
+
     if (confirm('Are you sure you want to delete this record?')) {
       this.userService.deleteUser(userId).subscribe(
         () => {
@@ -136,25 +190,27 @@ export class ManageRecordsComponent implements OnInit {
 
   onCreateUser(): void {
     if (this.createUserForm.invalid) return; // Check form validity
-  
+
     const newUser: User = this.createUserForm.value;
     this.userService.createUser(newUser).subscribe({
-      next: (response) => { // Use `response` here, without specific type
+      next: (response) => {
+        // Use `response` here, without specific type
         const createdUser = response; // Access the nested 'data' key
-  
+
         this.users.push(createdUser); // Add the new user to the local array
         console.log('User created successfully:', createdUser);
-  
+
         // Update the grid
         if (this.gridApi) {
-          this.gridApi.applyTransaction({ add: [createdUser] }); // Apply the transaction
+          // this.gridApi.applyTransaction({ add: [createdUser] }); // Apply the transaction
+          this.fetchUsers(); 
         } else {
-          console.error("Grid API is not initialized.");
+          console.error('Grid API is not initialized.');
         }
-  
+
         // Close the modal
         this.toggleModal();
-        console.log("Modal successfully closed.");
+        console.log('Modal successfully closed.');
       },
       error: (error) => console.error('Error creating user:', error),
     });
