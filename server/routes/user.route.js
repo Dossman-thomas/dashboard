@@ -7,12 +7,16 @@ import {
   updateUser,
   deleteUser,
   getCurrentUser,
+  checkEmailAvailability,
 } from "../controllers/index.js";
 
 export const userRouter = Router();
 
 // Create a new user route
 userRouter.post('/create-new', authenticateJWT, createUser); // endpoint: /api/users/create-new
+
+// no duplicate email check route
+userRouter.post('/check-email/:id', authenticateJWT, checkEmailAvailability); // endpoint: /api/users/check-email
 
 // Get a user by ID route
 userRouter.get('/:id', authenticateJWT, getUserById); // endpoint: /api/users/:id

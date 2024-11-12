@@ -15,6 +15,7 @@ export class MyAccountComponent implements OnInit {
   userForm: FormGroup;
   passwordForm: FormGroup;
   passwordError = '';
+  emailError = ''; 
   showPassword: boolean = false; 
   showNewPassword: boolean = false;
   showConfirmNewPassword: boolean = false;
@@ -72,6 +73,7 @@ export class MyAccountComponent implements OnInit {
     this.loadCurrentUser(); // Reset changes
   }
 
+  // onSubmit logic to update current user data
   onSubmit(): void {
     if (this.userForm.valid && this.currentUser) {
       const updatedUser: User = {
@@ -97,6 +99,12 @@ export class MyAccountComponent implements OnInit {
       }
     }
   }
+
+
+  // onSubmit w/email duplication check
+
+  
+  
 
   onChangePassword(): void {
     this.isChangingPassword = true;

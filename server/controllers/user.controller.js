@@ -7,6 +7,7 @@ import {
   updateUserService,
   deleteUserService,
   authenticateUserService,
+  checkEmailAvailabilityService,
 } from "../services/index.js";
 
 
@@ -189,6 +190,28 @@ export const deleteUser = async (req, res) => {
     return response(res, {
       statusCode: 500,
       message: messages.general.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+// check email availability
+export const checkEmailAvailability = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const currentUserId = req.params.id;
+
+    const isAvailable = await checkEmailAvailabilityService(email, currentUserId);
+    
+    return response(res, {
+      statusCode: 200,
+      message: messages.general.SUCCESS,
+      data: { isAvailable }
+    });
+  } catch (error) {
+    console.error(error);
+    return response(res, {
+      statusCode: 500,
+      message: messages.general.INTERNAL_SERVER_ERROR
     });
   }
 };

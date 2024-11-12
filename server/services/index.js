@@ -4,6 +4,7 @@ export {
   getAllUsersService,
   updateUserService,
   deleteUserService,
+  checkEmailAvailabilityService,
 } from "./user.service.js";
 
 export {

@@ -8,6 +8,7 @@ export {
   updateUser,
   deleteUser,
   getCurrentUser,
+  checkEmailAvailability,
 } from './user.controller.js';
 
 // Permissions

@@ -94,3 +94,18 @@ export const deleteUserService = async (id) => {
     throw new Error(error);
   }
 };
+
+// check email availability
+export const checkEmailAvailabilityService = async (email, currentUserId) => {
+  try {
+    const existingUser = await UserModel.findOne({
+      where: {
+        email,
+        id: { [Op.ne]: currentUserId } // exclude current user
+      }
+    });
+    return !existingUser; // returns true if email is available, false if taken
+  } catch (error) {
+    throw new Error(error);
+  }
+};

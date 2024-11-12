@@ -123,6 +123,7 @@ export class UserService {
         })
       );
   }
+  
 
   // Update user information and reset the current user in localStorage
   updateUser(id: number, userData: User): Observable<User> {
@@ -173,6 +174,15 @@ export class UserService {
         })
       );
   }
+
+// // Check if a user with the given email exists
+// emailExists(email: string): Observable<boolean> {
+//   return this.getAllUsers().pipe(
+//     map((users: User[] | null) => Array.isArray(users) && users.some((user: User) => user.email === email))
+//   );
+// }
+
+  
 
   // Verify user password (if you choose to implement it)
   // verifyPassword(
