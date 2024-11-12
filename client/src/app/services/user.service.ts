@@ -46,22 +46,6 @@ export class UserService {
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
-  // Method to get the current user from the server using the user's ID
-  // fetchCurrentUser(id: number): Observable<User> {
-  //   return this.http
-  //     .get<User>(`${this.baseUrl}/current-user/${id}`, { headers: this.getHeaders() }) // Adjusted endpoint
-  //     .pipe(
-  //       map((user) => {
-  //         this.setCurrentUser(user); // Set the current user
-  //         return user;
-  //       }),
-  //       catchError((error) => {
-  //         console.error('Error fetching current user:', error);
-  //         return throwError(() => new Error('Failed to fetch current user. Please try again later.'));
-  //       })
-  //     );
-  // }
-
   // Method to get the current user
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
