@@ -175,14 +175,17 @@ export class UserService {
       );
   }
 
-// // Check if a user with the given email exists
-// emailExists(email: string): Observable<boolean> {
-//   return this.getAllUsers().pipe(
-//     map((users: User[] | null) => Array.isArray(users) && users.some((user: User) => user.email === email))
-//   );
-// }
+  checkEmailAvailability(email: string, currentUserId: number): Observable<boolean> {
+    return this.http
+      .post<{ data: { isAvailable: boolean } }>(`${this.baseUrl}/check-email/${currentUserId}`, { email }, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response.data.isAvailable),
+        catchError(this.handleError<boolean>('checkEmailAvailability'))
+      );
+  }
 
-  
 
   // Verify user password (if you choose to implement it)
   // verifyPassword(
@@ -193,12 +196,6 @@ export class UserService {
   //     `${this.baseUrl}/${id}/verify-password`,
   //     passwordData
   //   );
-  // }
-
-  // Logout and clear the user from localStorage
-  // logout(): void {
-  //   localStorage.removeItem('currentUser');
-  //   this.setCurrentUser(null); // Clears the current user in the BehaviorSubject
   // }
 
   // Error handling method
