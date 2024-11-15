@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, User } from '../services/user.service';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-my-account',
@@ -8,15 +9,15 @@ import { UserService, User } from '../services/user.service';
   styleUrls: ['./my-account.component.css'],
 })
 export class MyAccountComponent implements OnInit {
-
   currentUser: User | null = null;
   isEditing = false;
   isChangingPassword = false;
   userForm: FormGroup;
   passwordForm: FormGroup;
   passwordError = '';
-  emailError = ''; 
-  showPassword: boolean = false; 
+  emailAvailable: boolean = false;
+  emailErrorMessage = '';
+  showPassword: boolean = false;
   showNewPassword: boolean = false;
   showConfirmNewPassword: boolean = false;
 
@@ -40,8 +41,8 @@ export class MyAccountComponent implements OnInit {
       confirmNewPassword: ['', Validators.required],
     });
   }
+
   ngOnInit(): void {
-    // Subscribe to changes in currentUser$ to keep currentUser updated in real time
     this.userService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       if (user) {
@@ -73,7 +74,6 @@ export class MyAccountComponent implements OnInit {
     this.loadCurrentUser(); // Reset changes
   }
 
-  // onSubmit logic to update current user data
   onSubmit(): void {
     if (this.userForm.valid && this.currentUser) {
       const updatedUser: User = {
@@ -82,29 +82,29 @@ export class MyAccountComponent implements OnInit {
         email: this.userForm.value.email,
       };
 
-      if (this.currentUser.id !== undefined) {
-        this.userService.updateUser(this.currentUser.id, updatedUser).subscribe({
-          next: (user) => {
-            console.log('User updated:', user);
-            this.userService.setCurrentUser(user); // Update the current user in UserService
-            alert('Your profile was updated successfully.');
-            this.isEditing = false;
-          },
-          error: (error) => {
-            console.error('Error updating user:', error);
-          },
-        });
-      } else {
-        console.error('User ID is undefined');
-      }
+      this.checkEmailAvailability(updatedUser.email).subscribe((isAvailable: boolean) => {
+        if (isAvailable) {
+          if (this.currentUser?.id !== undefined) {
+            this.userService.updateUser(this.currentUser.id, updatedUser).subscribe({
+              next: (user) => {
+                console.log('User updated:', user);
+                this.userService.setCurrentUser(user); // Update the current user in UserService
+                alert('Your profile was updated successfully.');
+                this.isEditing = false;
+              },
+              error: (error) => {
+                console.error('Error updating user:', error);
+              },
+            });
+          } else {
+            console.error('User ID is undefined');
+          }
+        } else {
+          this.emailErrorMessage = 'The email you\'ve chosen is already in use. Please choose a different email.';
+        }
+      });
     }
   }
-
-
-  // onSubmit w/email duplication check
-
-  
-  
 
   onChangePassword(): void {
     this.isChangingPassword = true;
@@ -164,6 +164,13 @@ export class MyAccountComponent implements OnInit {
 
   toggleConfirmNewPasswordVisibility() {
     this.showConfirmNewPassword = !this.showConfirmNewPassword;
+  }
+
+  private checkEmailAvailability(email: string): any {
+    if (this.currentUser?.id !== undefined) {
+      return this.userService.checkEmailAvailability(email, this.currentUser.id);
+    }
+    return of(false); // or handle the undefined case appropriately
   }
 
   private passwordValidator(control: { value: string }) {
