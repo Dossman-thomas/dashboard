@@ -14,7 +14,7 @@ export const loginUser = async (req, res) => {
     // If user authentication fails, return an appropriate response
     if (!user) {
       return response(res, {
-        statusCode: 401,
+        statusCode: 404,
         message: messages.general.INVALID_CREDENTIAL,
       });
     }
@@ -35,8 +35,8 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     console.error(error);
     return response(res, {
-      statusCode: 500,
-      message: messages.general.INTERNAL_SERVER_ERROR,
+      statusCode: error.status || 500,
+      message: error.message || messages.general.INTERNAL_SERVER_ERROR,
     });
   }
 };

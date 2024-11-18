@@ -12,14 +12,18 @@ export const authenticateUserService = async (email, password) => {
     });
 
     if (!user) {
-      throw new Error(messages.general.USER_NOT_FOUND);
+      const error = new Error('Invalid credentials. Please check your email and password, then try again.');
+      error.status = 404;
+      throw error;
     }
 
     // Compare the provided password with the hashed password stored in the database
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      throw new Error(messages.general.INVALID_CREDENTIAL);
+      const error = new Error('Invalid credentials. Please check your email and password, then try again.');
+      error.status = 404;
+      throw error;
     }
 
     // Create a user object without the password
@@ -40,6 +44,6 @@ export const authenticateUserService = async (email, password) => {
     // Return the user object (without password) and the token
     return { token, user: userResponse };
   } catch (error) {
-    throw new Error(error.message);
+    throw error;
   }
 };
