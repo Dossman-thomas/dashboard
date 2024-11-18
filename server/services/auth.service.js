@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt"; 
 import jwt from "jsonwebtoken";
-import { messages } from "../messages/index.js";
 import { UserModel } from "../database/models/user.model.js";
 
 export const authenticateUserService = async (email, password) => {

@@ -11,14 +11,6 @@ export const loginUser = async (req, res) => {
     // Authenticate user
     const user = await authenticateUserService(email, password);
 
-    // If user authentication fails, return an appropriate response
-    if (!user) {
-      return response(res, {
-        statusCode: 404,
-        message: messages.general.INVALID_CREDENTIAL,
-      });
-    }
-
     // Generate JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email }, // Payload
