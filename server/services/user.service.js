@@ -1,6 +1,5 @@
 // Import the user model
 import { UserModel } from "../database/models/user.model.js";
-import bcrypt from "bcrypt";
 import { pagination } from "../utils/common.util.js";
 import { Op } from "sequelize";
 
@@ -8,7 +7,16 @@ import { Op } from "sequelize";
 export const createUserService = async (userData) => {
   try {
     const newUser = await UserModel.create(userData);
-    return newUser;
+    // Return user without password
+    const userResponse = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      createdAt: newUser.createdAt,
+      updatedAt: newUser.updatedAt
+    };
+    return userResponse;
   } catch (error) {
     throw new Error(error);
   }
@@ -26,16 +34,6 @@ export const getUserByIdService = async (id) => {
     throw new Error(error);
   }
 };
-
-// // Get all users
-// export const getAllUsersService = async () => {
-//   try {
-//     const users = await UserModel.findAll();
-//     return users;
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// };
 
 // Get all users with pagination
 export const getAllUsersService = async ({
@@ -75,7 +73,16 @@ export const updateUserService = async (id, updatedData) => {
       throw new Error("User not found");
     }
     await user.update(updatedData);
-    return user;
+    
+    // Return updated user without password
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      updatedAt: user.updatedAt
+    };
+    return userResponse;
   } catch (error) {
     throw new Error(error);
   }

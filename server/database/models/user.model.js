@@ -2,7 +2,6 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from '../../config/index.js';
 import bcrypt from 'bcrypt';
 
-// User model
 export const UserModel = sequelize.define('users', {
     id: {
         type: DataTypes.UUID,
@@ -24,29 +23,35 @@ export const UserModel = sequelize.define('users', {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
+        // // exclude from JSON serialization
+        // get() {
+        //     return undefined;
+        // }
     },
     role: {
         type: DataTypes.ENUM('admin', 'data manager', 'employee'),
         allowNull: false,
     },
 }, {
-    freezeTableName: true, // Prevent sequelize from pluralizing the table name
-    timestamps: true, // Enable createdAt and updatedAt
+    freezeTableName: true,
+    timestamps: true,
+    // explicitly exclude password in toJSON method
+    defaultScope: {
+        attributes: ['id', 'name', 'email', 'role'], // exclude password from default query
+    }
 });
 
-// Hashing the password before saving it to the database
+// Existing password hashing and verification methods remain the same
 UserModel.beforeCreate(async (user) => {
     user.password = await bcrypt.hash(user.password, 10);
 });
 
-// Hash password before updating if it has changed
 UserModel.beforeUpdate(async (user) => {
     if (user.changed('password')) {
         user.password = await bcrypt.hash(user.password, 10);
     }
 });
 
-// Password verification method
 UserModel.prototype.verifyPassword = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
