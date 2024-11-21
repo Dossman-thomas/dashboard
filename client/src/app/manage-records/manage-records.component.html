@@ -10,7 +10,7 @@
     <button class="btn create-user-btn" *ngIf="canCreate" (click)="toggleModal()">Create User</button>
   </div>
 
-  <p *ngIf="canUpdate">* To update records click on the table cell you'd like to update</p>
+  <p *ngIf="canUpdate" class="tertiary-text">* To update records click on the table cell you'd like to update.</p>
 
 <!-- User Records Table -->
   <ag-grid-angular
