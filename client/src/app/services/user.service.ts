@@ -123,7 +123,7 @@ export class UserService {
         })
       );
   }
-  
+
 
   // Update user information and reset the current user in localStorage
   updateUser(id: number, userData: User): Observable<User> {
