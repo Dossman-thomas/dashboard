@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { PermissionsService } from '../services/permissions.service';
 import { UserService } from '../services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-delete-button-renderer',
@@ -21,7 +22,8 @@ export class DeleteButtonRendererComponent implements ICellRendererAngularComp, 
 
   constructor(
     private permissionsService: PermissionsService,
-    private userService: UserService
+    private userService: UserService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +49,7 @@ export class DeleteButtonRendererComponent implements ICellRendererAngularComp, 
       const userId = this.params.data.id;
       this.params.onClick(userId);
     } else {
-      alert('You do not have permission to delete this record.');
+      this.toastr.error('You do not have permission to delete this record.');
     }
   }
 }

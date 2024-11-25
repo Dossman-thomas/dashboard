@@ -158,8 +158,11 @@ export class ManageRecordsComponent implements OnInit {
     const updatedUser: User = event.data;
     if (updatedUser.id) {
       this.userService.updateUser(updatedUser.id, updatedUser).subscribe({
-        next: () => this.toastr,
-        error: (error) => console.error('Error updating user:', error),
+        next: () => this.toastr.success('User updated successfully!'),
+        error: (error) => {
+          console.error('Error updating user:', error);
+          this.toastr.error('Error updating user.');
+        }
       });
     } else {
       console.error('User ID is undefined');
@@ -167,10 +170,6 @@ export class ManageRecordsComponent implements OnInit {
   }
 
   onDelete(userId: number): void {
-    // if (!this.canDelete) {
-    //   alert("You don't have permission to delete this record.");
-    //   return;
-    // }
 
     if (confirm('Are you sure you want to delete this record?')) {
       this.userService.deleteUser(userId).subscribe(
@@ -178,9 +177,11 @@ export class ManageRecordsComponent implements OnInit {
           // Remove the user from the array after successful deletion
           this.users = this.users.filter((user) => user.id !== userId);
           this.rowData = [...this.users]; // Update the rowData for the AG Grid
+          this.toastr.success('User deleted successfully!');
         },
         (error) => {
           console.error('Error deleting user:', error); // Handle errors
+          this.toastr.error('Error deleting user.');
         }
       );
     }
@@ -202,6 +203,7 @@ export class ManageRecordsComponent implements OnInit {
 
         this.users.push(createdUser); // Add the new user to the local array
         console.log('User created successfully:', createdUser);
+        this.toastr.success('User created successfully!');
 
         // Update the grid
         if (this.gridApi) {
@@ -213,9 +215,11 @@ export class ManageRecordsComponent implements OnInit {
 
         // Close the modal
         this.toggleModal();
-        console.log('Modal successfully closed.');
       },
-      error: (error) => console.error('Error creating user:', error),
+      error: (error) => {
+        console.error('Error creating user:', error);
+        this.toastr.error('Error creating user.');
+      }
     });
   }
 
