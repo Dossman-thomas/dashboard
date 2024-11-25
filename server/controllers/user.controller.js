@@ -8,6 +8,7 @@ import {
   deleteUserService,
   authenticateUserService,
   checkEmailAvailabilityService,
+  passwordCheckService,
 } from "../services/index.js";
 
 
@@ -216,22 +217,18 @@ export const checkEmailAvailability = async (req, res) => {
   }
 };
 
-// Verify user password
-export const verifyUserPassword = async (req, res) => {
+// Compare current password to user's input
+export const checkCurrentPassword = async (req, res) => {
   try {
-    const user = await authenticateUserService(
-      req.body.email,
-      req.body.password
-    );
-    if (!user) {
-      return response(res, {
-        statusCode: 401,
-        message: messages.general.INVALID_CREDENTIALS,
-      });
-    }
+    const userId = req.params.id;
+    const { currentPassword } = req.body;
+
+    const isPasswordValid = await passwordCheckService(userId, currentPassword);
+    
     return response(res, {
       statusCode: 200,
       message: messages.general.SUCCESS,
+      data: { isValid: isPasswordValid }
     });
   } catch (error) {
     console.error(error);

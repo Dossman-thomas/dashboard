@@ -187,16 +187,17 @@ export class UserService {
   }
 
 
-  // Verify user password (if you choose to implement it)
-  // verifyPassword(
-  //   id: number,
-  //   passwordData: { password: string }
-  // ): Observable<boolean> {
-  //   return this.http.post<boolean>(
-  //     `${this.baseUrl}/${id}/verify-password`,
-  //     passwordData
-  //   );
-  // }
+  // Verify user password
+  checkPassword(userId: number, currentPassword: string): Observable<boolean> {
+    return this.http
+      .post<{ data: { isValid: boolean } }>(`${this.baseUrl}/check-password/${userId}`, { currentPassword }, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => response.data.isValid),
+        catchError(this.handleError<boolean>('checkPassword'))
+      );
+  }
 
   // Error handling method
   private handleError<T>(operation = 'operation', result?: T) {
