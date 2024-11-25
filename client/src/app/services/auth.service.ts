@@ -4,6 +4,8 @@ import { BehaviorSubject } from 'rxjs';
 import { UserService } from './user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +18,8 @@ export class AuthService {
     private http: HttpClient,
     private userService: UserService,
     private router: Router,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private toastr: ToastrService
   ) {
     this.checkInitialAuthState();
     window.addEventListener('popstate', this.handlePopStateEvent.bind(this));
@@ -68,12 +71,12 @@ export class AuthService {
           console.log('Logged in user:', user.id, user.name, user.role);
 
           // Notify the user and navigate to dashboard
-          alert('Logged in successfully');
+          this.toastr.success('Logged in successfully!');
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           console.error('Login error:', err); // Log the error for debugging
-          alert('Invalid credentials. Please try again.');
+          this.toastr.error('Invalid credentials. Please try again.');
         },
         complete: () => {
           console.log('Login request completed.');
@@ -90,6 +93,7 @@ export class AuthService {
     // update authentication state
     this.isLoggedInSubject.next(false);
 
+    this.toastr.info('Logged out successfully.');
     // navigate to login page after logout
     this.router.navigate(['/login']);
   }

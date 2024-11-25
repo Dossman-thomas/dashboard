@@ -5,6 +5,7 @@ import { ColDef, GridApi } from 'ag-grid-community';
 import { DeleteButtonRendererComponent } from '../delete-button-renderer/delete-button-renderer.component';
 import { AgGridAngular } from 'ag-grid-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-manage-records',
@@ -30,7 +31,8 @@ export class ManageRecordsComponent implements OnInit {
   constructor(
     private userService: UserService,
     private fb: FormBuilder,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private toastr: ToastrService
   ) {}
 
   paginationPageSizeSelector = [10, 25, 50, 100];
@@ -149,13 +151,14 @@ export class ManageRecordsComponent implements OnInit {
   onCellValueChanged(event: any): void {
     if (!this.canUpdate) {
       console.error('You do not have permission to update this record.');
+      this.toastr.error('You do not have permission to update this record.');
       return;
     }
 
     const updatedUser: User = event.data;
     if (updatedUser.id) {
       this.userService.updateUser(updatedUser.id, updatedUser).subscribe({
-        next: () => alert('User updated successfully!'),
+        next: () => this.toastr,
         error: (error) => console.error('Error updating user:', error),
       });
     } else {
